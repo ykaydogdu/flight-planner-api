@@ -10,8 +10,8 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
 
     @Query("""
         select count(f) from Flight f where f.airline.code = :airlineCode
-        and f.sourceAirport.code = :srcAirportCode
-        and f.destinationAirport.code = :destAirportCode
+        and f.srcAirport.code = :srcAirportCode
+        and f.destAirport.code = :destAirportCode
         and f.departureTime between :startOfDay and :endOfDay
     """)
     long dailyFlightCount(

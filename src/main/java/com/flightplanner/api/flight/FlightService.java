@@ -77,8 +77,8 @@ public class FlightService {
         boolean dateChanged = !existingFlight.getDepartureTime().toLocalDate()
                 .equals(updatedFlight.getDepartureTime().toLocalDate());
         boolean airlineChanged = !existingFlight.getAirline().getCode().equals(updatedFlight.getAirlineCode());
-        boolean sourceChanged = !existingFlight.getSourceAirport().getCode().equals(updatedFlight.getSrcAirportCode());
-        boolean destChanged = !existingFlight.getDestinationAirport().getCode().equals(updatedFlight.getDestAirportCode());
+        boolean sourceChanged = !existingFlight.getSrcAirport().getCode().equals(updatedFlight.getSrcAirportCode());
+        boolean destChanged = !existingFlight.getDestAirport().getCode().equals(updatedFlight.getDestAirportCode());
 
         return dateChanged || airlineChanged || sourceChanged || destChanged;
     }
@@ -99,8 +99,8 @@ public class FlightService {
         // Check flight number
         long existingFlightsCount = flightRepository.dailyFlightCount(
                 flight.getAirline().getCode(),
-                flight.getSourceAirport().getCode(),
-                flight.getDestinationAirport().getCode(),
+                flight.getSrcAirport().getCode(),
+                flight.getDestAirport().getCode(),
                 startOfDay,
                 endOfDay
         );
@@ -110,8 +110,8 @@ public class FlightService {
             throw new FlightLimitExceededException(
                     MAX_DAILY_FLIGHTS,
                     flight.getAirline().getCode(),
-                    flight.getSourceAirport().getCode(),
-                    flight.getDestinationAirport().getCode()
+                    flight.getSrcAirport().getCode(),
+                    flight.getDestAirport().getCode()
             );
         }
     }

@@ -28,22 +28,22 @@ public class Flight {
     private Airline airline;
 
     @ManyToOne
-    @JoinColumn(name = "source_airport_code", nullable = false, referencedColumnName = "code")
-    private Airport sourceAirport;
+    @JoinColumn(name = "src_airport_code", nullable = false, referencedColumnName = "code")
+    private Airport srcAirport;
 
     @ManyToOne
-    @JoinColumn(name = "destination_airport_code", nullable = false, referencedColumnName = "code")
-    private Airport destinationAirport;
+    @JoinColumn(name = "dest_airport_code", nullable = false, referencedColumnName = "code")
+    private Airport destAirport;
 
-    public Flight(final LocalDateTime departureTime, final Airline airline, final Airport sourceAirport, final Airport destinationAirport) {
-        if (sourceAirport == destinationAirport) {
+    public Flight(final LocalDateTime departureTime, final Airline airline, final Airport srcAirport, final Airport destAirport) {
+        if (srcAirport == destAirport) {
             throw new IllegalArgumentException("Source and destination Airport are the same");
         }
 
         this.departureTime = departureTime;
 
         this.airline = airline;
-        this.sourceAirport = sourceAirport;
-        this.destinationAirport = destinationAirport;
+        this.srcAirport = srcAirport;
+        this.destAirport = destAirport;
     }
 }

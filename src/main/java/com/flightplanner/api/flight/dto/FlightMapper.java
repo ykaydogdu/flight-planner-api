@@ -31,8 +31,8 @@ public class FlightMapper {
         dto.setId(flight.getId());
         dto.setDepartureTime(flight.getDepartureTime());
         dto.setAirlineCode(flight.getAirline().getCode());
-        dto.setSrcAirportCode(flight.getSourceAirport().getCode());
-        dto.setDestAirportCode(flight.getDestinationAirport().getCode());
+        dto.setSrcAirportCode(flight.getSrcAirport().getCode());
+        dto.setDestAirportCode(flight.getDestAirport().getCode());
         return dto;
     }
 
@@ -76,14 +76,14 @@ public class FlightMapper {
         }
         flight.getAirline().setCode(dto.getAirlineCode());
 
-        if (flight.getSourceAirport() == null) {
-            flight.setSourceAirport(new Airport());
+        if (flight.getSrcAirport() == null) {
+            flight.setSrcAirport(new Airport());
         }
-        flight.getSourceAirport().setCode(dto.getSrcAirportCode());
+        flight.getSrcAirport().setCode(dto.getSrcAirportCode());
 
-        if (flight.getDestinationAirport() == null) {
-            flight.setDestinationAirport(new Airport());
+        if (flight.getDestAirport() == null) {
+            flight.setDestAirport(new Airport());
         }
-        flight.getDestinationAirport().setCode(dto.getDestAirportCode());
+        flight.getDestAirport().setCode(dto.getDestAirportCode());
     }
 }
