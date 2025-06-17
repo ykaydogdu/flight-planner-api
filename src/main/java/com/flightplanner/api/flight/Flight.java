@@ -1,9 +1,11 @@
 package com.flightplanner.api.flight;
 
-//import com.flightplanner.api.airline.Airline;
-//import com.flightplanner.api.airport.Airport;
+import com.flightplanner.api.airline.Airline;
+import com.flightplanner.api.airport.Airport;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,8 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Flight {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -20,21 +23,27 @@ public class Flight {
     @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
 
-    @Column(name = "airline_code", nullable = false)
-    private String airlineCode;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "airline_code", nullable = false, referencedColumnName = "code")
+    private Airline airline;
 
-    @Column(name = "source_airport_code", nullable = false)
-    private String srcAirportCode;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "source_airport_code", nullable = false, referencedColumnName = "code")
+    private Airport sourceAirport;
 
-    @Column(name = "destination_airport_code", nullable = false)
-    private String destAirportCode;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "destination_airport_code", nullable = false, referencedColumnName = "code")
+    private Airport destinationAirport;
 
-    public Flight() {}
-
-    public Flight(LocalDateTime departureTime, String airlineCode, String srcAirportCode, String destAirportCode) {
+    public Flight(final LocalDateTime departureTime, final String airlineCode, final String sourceAirportCode, final String destinationAirportCode) {
         this.departureTime = departureTime;
-        this.airlineCode = airlineCode;
-        this.srcAirportCode = srcAirportCode;
-        this.destAirportCode = destAirportCode;
+
+        this.airline = new Airline();
+        this.sourceAirport = new Airport();
+        this.destinationAirport = new Airport();
+
+        this.airline.setCode(airlineCode);
+        this.sourceAirport.setCode(sourceAirportCode);
+        this.destinationAirport.setCode(destinationAirportCode);
     }
 }

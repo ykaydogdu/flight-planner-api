@@ -1,20 +1,19 @@
 package com.flightplanner.api.airport;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 public class Airport {
 
     @Id
-    @Getter
-    @Setter
+    @Column(name = "code", length = 3)
     private String code;
 
-    @Getter
-    @Setter
+    @Column(name = "name")
     private String name;
 
 }

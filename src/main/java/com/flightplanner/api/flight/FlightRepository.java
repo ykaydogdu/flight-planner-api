@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 public interface FlightRepository extends JpaRepository<Flight, Long> {
 
     @Query("""
-        select count(f) from Flight f where f.airlineCode = :airlineCode
-        and f.srcAirportCode = :srcAirportCode
-        and f.destAirportCode = :destAirportCode
+        select count(f) from Flight f where f.airline = :airlineCode
+        and f.sourceAirport = :srcAirportCode
+        and f.destinationAirport = :destAirportCode
         and f.departureTime between :startOfDay and :endOfDay
     """)
     long dailyFlightCount(
