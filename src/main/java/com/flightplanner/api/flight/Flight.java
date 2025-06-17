@@ -3,7 +3,6 @@ package com.flightplanner.api.flight;
 import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airport.Airport;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,27 +21,27 @@ public class Flight {
     @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "airline_code", nullable = false, referencedColumnName = "code")
     private Airline airline;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "source_airport_code", nullable = false, referencedColumnName = "code")
     private Airport sourceAirport;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "destination_airport_code", nullable = false, referencedColumnName = "code")
     private Airport destinationAirport;
 
-    public Flight(final LocalDateTime departureTime, final String airlineCode, final String sourceAirportCode, final String destinationAirportCode) {
+    public Flight(final LocalDateTime departureTime, final Airline airline, final Airport sourceAirport, final Airport destinationAirport) {
+        if (sourceAirport == destinationAirport) {
+            throw new IllegalArgumentException("Source and destination Airport are the same");
+        }
+
         this.departureTime = departureTime;
 
-        this.airline = new Airline();
-        this.sourceAirport = new Airport();
-        this.destinationAirport = new Airport();
-
-        this.airline.setCode(airlineCode);
-        this.sourceAirport.setCode(sourceAirportCode);
-        this.destinationAirport.setCode(destinationAirportCode);
+        this.airline = airline;
+        this.sourceAirport = sourceAirport;
+        this.destinationAirport = destinationAirport;
     }
 }

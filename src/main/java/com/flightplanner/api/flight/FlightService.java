@@ -53,12 +53,8 @@ public class FlightService {
         boolean isValidationRequired = hasFlightAttrChanged(existingFlight, requestDTO);
 
         if (isValidationRequired) {
-            validateFlightLimit(new Flight(
-                    requestDTO.getDepartureTime(),
-                    requestDTO.getAirlineCode(),
-                    requestDTO.getSrcAirportCode(),
-                    requestDTO.getDestAirportCode()
-            ));
+            Flight updatedFlight = flightMapper.toEntity(requestDTO);
+            validateFlightLimit(updatedFlight);
         }
 
         flightMapper.updateEntityFromDto(requestDTO, existingFlight);
@@ -74,9 +70,9 @@ public class FlightService {
     private boolean hasFlightAttrChanged(final Flight existingFlight, final FlightRequestDTO updatedFlight) {
         boolean dateChanged = !existingFlight.getDepartureTime().toLocalDate()
                 .equals(updatedFlight.getDepartureTime().toLocalDate());
-        boolean airlineChanged = !existingFlight.getAirlineCode().equals(updatedFlight.getAirlineCode());
-        boolean sourceChanged = !existingFlight.getSrcAirportCode().equals(updatedFlight.getSrcAirportCode());
-        boolean destChanged = !existingFlight.getDestAirportCode().equals(updatedFlight.getDestAirportCode());
+        boolean airlineChanged = !existingFlight.getAirline().getCode().equals(updatedFlight.getAirlineCode());
+        boolean sourceChanged = !existingFlight.getSourceAirport().getCode().equals(updatedFlight.getSrcAirportCode());
+        boolean destChanged = !existingFlight.getDestinationAirport().getCode().equals(updatedFlight.getDestAirportCode());
 
         return dateChanged || airlineChanged || sourceChanged || destChanged;
     }
@@ -96,9 +92,9 @@ public class FlightService {
 
         // Check flight number
         long existingFlightsCount = flightRepository.dailyFlightCount(
-                flight.getAirlineCode(),
-                flight.getSrcAirportCode(),
-                flight.getDestAirportCode(),
+                flight.getAirline().getCode(),
+                flight.getSourceAirport().getCode(),
+                flight.getDestinationAirport().getCode(),
                 startOfDay,
                 endOfDay
         );
@@ -107,9 +103,9 @@ public class FlightService {
         if (existingFlightsCount >= MAX_DAILY_FLIGHTS) {
             throw new FlightLimitExceededException(
                     MAX_DAILY_FLIGHTS,
-                    flight.getSrcAirportCode(),
-                    flight.getDestAirportCode(),
-                    flight.getAirlineCode()
+                    flight.getSourceAirport().getCode(),
+                    flight.getDestinationAirport().getCode(),
+                    flight.getDestinationAirport().getCode()
             );
         }
     }
