@@ -103,8 +103,8 @@ public class FlightService {
         if (existingFlightsCount >= MAX_DAILY_FLIGHTS) {
             throw new FlightLimitExceededException(
                     MAX_DAILY_FLIGHTS,
+                    flight.getAirline().getCode(),
                     flight.getSourceAirport().getCode(),
-                    flight.getDestinationAirport().getCode(),
                     flight.getDestinationAirport().getCode()
             );
         }
