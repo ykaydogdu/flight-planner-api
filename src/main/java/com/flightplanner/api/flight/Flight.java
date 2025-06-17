@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Flight {
 
@@ -13,6 +15,10 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private long id;
+
+    @Getter
+    @Setter
+    private LocalDateTime departureTime;
 
     @OneToOne
     @Getter
@@ -28,4 +34,16 @@ public class Flight {
     @Getter
     @Setter
     private Airport destAirport;
+
+    String getAirlineCode() {
+        return airline.getCode();
+    }
+
+    String getSrcAirportCode() {
+        return srcAirport.getCode();
+    }
+
+    String getDestAirportCode() {
+        return destAirport.getCode();
+    }
 }
