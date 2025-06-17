@@ -2,9 +2,7 @@ package com.flightplanner.api.flight;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airline.AirlineService;
-import com.flightplanner.api.airport.Airport;
 import com.flightplanner.api.airport.AirportService;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
@@ -59,9 +57,9 @@ class FlightControllerTest {
     void getAllFlights_shouldReturnListOfFlights() throws Exception {
         // Arrange
         LocalDateTime now = LocalDateTime.now();
-        Flight flight1 = new Flight(1L, now, new Airline("THY", ""), new Airport("IST", ""), new Airport("SAW", ""));
-        Flight flight2 = new Flight(2L, now.plusHours(2), new Airline("DL", ""), new Airport("IST", ""), new Airport("SAW", ""));
-        List<FlightResponseDTO> allFlights = Arrays.asList(flightMapper.toResponseDto(flight1), flightMapper.toResponseDto(flight2));
+        FlightResponseDTO flight1 = new FlightResponseDTO(1L, now, "THY", "IST", "SAW");
+        FlightResponseDTO flight2 = new FlightResponseDTO(2L, now.plusHours(2), "DL", "IST", "SAW");
+        List<FlightResponseDTO> allFlights = Arrays.asList(flight1, flight2);
 
         // Mock service behavior
         when(flightService.getAllFlights()).thenReturn(allFlights);
