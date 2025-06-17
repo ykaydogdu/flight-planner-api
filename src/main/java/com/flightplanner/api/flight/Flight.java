@@ -1,7 +1,7 @@
 package com.flightplanner.api.flight;
 
-import com.flightplanner.api.airline.Airline;
-import com.flightplanner.api.airport.Airport;
+//import com.flightplanner.api.airline.Airline;
+//import com.flightplanner.api.airport.Airport;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,41 +9,32 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 public class Flight {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Getter
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Getter
-    @Setter
+    @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
 
-    @OneToOne
-    @Getter
-    @Setter
-    private Airline airline;
+    @Column(name = "airline_code", nullable = false)
+    private String airlineCode;
 
-    @OneToOne
-    @Getter
-    @Setter
-    private Airport srcAirport;
+    @Column(name = "source_airport_code", nullable = false)
+    private String srcAirportCode;
 
-    @OneToOne
-    @Getter
-    @Setter
-    private Airport destAirport;
+    @Column(name = "destination_airport_code", nullable = false)
+    private String destAirportCode;
 
-    String getAirlineCode() {
-        return airline.getCode();
-    }
+    public Flight() {}
 
-    String getSrcAirportCode() {
-        return srcAirport.getCode();
-    }
-
-    String getDestAirportCode() {
-        return destAirport.getCode();
+    public Flight(LocalDateTime departureTime, String airlineCode, String srcAirportCode, String destAirportCode) {
+        this.departureTime = departureTime;
+        this.airlineCode = airlineCode;
+        this.srcAirportCode = srcAirportCode;
+        this.destAirportCode = destAirportCode;
     }
 }

@@ -1,6 +1,10 @@
 package com.flightplanner.api.flight;
 
+import com.flightplanner.api.flight.dto.FlightRequestDTO;
+import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +26,9 @@ public class FlightController {
     }
 
     @PostMapping("/")
-    Flight createFlight(@RequestBody Flight flight) {
-        return flightService.createFlight(flight);
+    ResponseEntity<FlightResponseDTO> createFlight(@RequestBody FlightRequestDTO requestDTO) {
+        FlightResponseDTO responseDTO = flightService.createFlight(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     // Single Item Ops
@@ -33,8 +38,9 @@ public class FlightController {
     }
 
     @PutMapping("/{id}")
-    Flight updateFlight(@PathVariable Long id, @RequestBody Flight flight) {
-        return flightService.updateFlight(id, flight);
+    ResponseEntity<FlightResponseDTO> updateFlight(@PathVariable Long id, @RequestBody FlightRequestDTO dto) {
+        FlightResponseDTO responseDTO = flightService.updateFlight(id, dto);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,8 @@
 package com.flightplanner.api.flight;
 
+import com.flightplanner.api.flight.dto.FlightMapper;
+import com.flightplanner.api.flight.dto.FlightRequestDTO;
+import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
 import com.flightplanner.api.flight.exception.FlightNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +18,13 @@ import java.util.List;
 public class FlightService {
 
     private final FlightRepository flightRepository;
+    private final FlightMapper flightMapper;
     private static final int MAX_DAILY_FLIGHTS = 3;
 
     @Autowired
-    public FlightService(final FlightRepository flightRepository) {
+    public FlightService(final FlightRepository flightRepository, final FlightMapper flightMapper) {
         this.flightRepository = flightRepository;
+        this.flightMapper = flightMapper;
     }
 
     public List<Flight> getAllFlights() {
@@ -32,29 +37,32 @@ public class FlightService {
     }
 
     @Transactional
-    public Flight createFlight(final Flight flight) {
+    public FlightResponseDTO createFlight(final FlightRequestDTO requestDTO) {
+        Flight flight = flightMapper.toEntity(requestDTO);
         validateFlightLimit(flight);
-        return flightRepository.save(flight);
+        Flight savedFlight = flightRepository.save(flight);
+        return flightMapper.toResponseDto(savedFlight);
     }
 
     @Transactional
-    public Flight updateFlight(final Long id, final Flight updatedFlight) {
+    public FlightResponseDTO updateFlight(final Long id, final FlightRequestDTO requestDTO) {
         // If the new flight violates the flight limit, we should not perform the action
         // Fetch current flight
         Flight existingFlight = getFlightById(id);
 
-        boolean isValidationRequired = hasFlightAttrChanged(existingFlight, updatedFlight);
+        boolean isValidationRequired = hasFlightAttrChanged(existingFlight, requestDTO);
 
         if (isValidationRequired) {
-            validateFlightLimit(updatedFlight);
+            validateFlightLimit(new Flight(
+                    requestDTO.getDepartureTime(),
+                    requestDTO.getAirlineCode(),
+                    requestDTO.getSrcAirportCode(),
+                    requestDTO.getDestAirportCode()
+            ));
         }
 
-        existingFlight.setAirline(updatedFlight.getAirline());
-        existingFlight.setSrcAirport(updatedFlight.getSrcAirport());
-        existingFlight.setDestAirport(updatedFlight.getDestAirport());
-        existingFlight.setDepartureTime(updatedFlight.getDepartureTime());
-
-        return flightRepository.save(existingFlight);
+        flightMapper.updateEntityFromDto(requestDTO, existingFlight);
+        return flightMapper.toResponseDto(existingFlight);
     }
 
     /**
@@ -63,12 +71,12 @@ public class FlightService {
      * @param updatedFlight Updated record
      * @return If the core attributes are changed or not
      */
-    private boolean hasFlightAttrChanged(final Flight existingFlight, final Flight updatedFlight) {
+    private boolean hasFlightAttrChanged(final Flight existingFlight, final FlightRequestDTO updatedFlight) {
         boolean dateChanged = !existingFlight.getDepartureTime().toLocalDate()
                 .equals(updatedFlight.getDepartureTime().toLocalDate());
-        boolean airlineChanged = !existingFlight.getAirline().equals(updatedFlight.getAirline());
-        boolean sourceChanged = !existingFlight.getSrcAirport().equals(updatedFlight.getSrcAirport());
-        boolean destChanged = !existingFlight.getDestAirport().equals(updatedFlight.getDestAirport());
+        boolean airlineChanged = !existingFlight.getAirlineCode().equals(updatedFlight.getAirlineCode());
+        boolean sourceChanged = !existingFlight.getSrcAirportCode().equals(updatedFlight.getSrcAirportCode());
+        boolean destChanged = !existingFlight.getDestAirportCode().equals(updatedFlight.getDestAirportCode());
 
         return dateChanged || airlineChanged || sourceChanged || destChanged;
     }
