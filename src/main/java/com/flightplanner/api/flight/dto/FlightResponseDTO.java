@@ -1,12 +1,16 @@
 package com.flightplanner.api.flight.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class FlightResponseDTO {
     private long id;
     private LocalDateTime departureTime;

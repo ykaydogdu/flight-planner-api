@@ -21,30 +21,29 @@ public class FlightController {
     }
 
     @GetMapping("/")
-    List<Flight> getAllFlights() {
-        return flightService.getAllFlights();
+    ResponseEntity<List<FlightResponseDTO>> getAllFlights() {
+        return new ResponseEntity<>(flightService.getAllFlights(), HttpStatus.OK);
     }
 
     @PostMapping("/")
     ResponseEntity<FlightResponseDTO> createFlight(@RequestBody FlightRequestDTO requestDTO) {
-        FlightResponseDTO responseDTO = flightService.createFlight(requestDTO);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(flightService.createFlight(requestDTO), HttpStatus.CREATED);
     }
 
     // Single Item Ops
     @GetMapping("/{id}")
-    Flight getFlightById(@PathVariable Long id) {
-        return flightService.getFlightById(id);
+    ResponseEntity<FlightResponseDTO> getFlightById(@PathVariable Long id) {
+        return new ResponseEntity<>(flightService.getFlightById(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     ResponseEntity<FlightResponseDTO> updateFlight(@PathVariable Long id, @RequestBody FlightRequestDTO dto) {
-        FlightResponseDTO responseDTO = flightService.updateFlight(id, dto);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        return new ResponseEntity<>(flightService.updateFlight(id, dto), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    void deleteFlight(@PathVariable Long id) {
+    ResponseEntity<Void> deleteFlight(@PathVariable Long id) {
         flightService.deleteFlight(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

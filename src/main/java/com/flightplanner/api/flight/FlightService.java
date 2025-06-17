@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FlightService {
@@ -27,28 +28,33 @@ public class FlightService {
         this.flightMapper = flightMapper;
     }
 
-    public List<Flight> getAllFlights() {
-        return flightRepository.findAll();
+    public List<FlightResponseDTO> getAllFlights() {
+        List<Flight> flights = flightRepository.findAll();
+        return flights.stream()
+                .map(flightMapper::toResponseDto)
+                .collect(Collectors.toList());
     }
 
-    public Flight getFlightById(final Long id) {
-        return flightRepository.findById(id)
-                .orElseThrow(() -> new FlightNotFoundException(id));
+    public FlightResponseDTO getFlightById(final Long id) {
+        return flightMapper.toResponseDto(
+                flightRepository.findById(id)
+                        .orElseThrow(() -> new FlightNotFoundException(id)));
     }
 
     @Transactional
     public FlightResponseDTO createFlight(final FlightRequestDTO requestDTO) {
         Flight flight = flightMapper.toEntity(requestDTO);
         validateFlightLimit(flight);
-        Flight savedFlight = flightRepository.save(flight);
-        return flightMapper.toResponseDto(savedFlight);
+        Flight createdFlight = flightRepository.save(flight);
+        return flightMapper.toResponseDto(createdFlight);
     }
 
     @Transactional
     public FlightResponseDTO updateFlight(final Long id, final FlightRequestDTO requestDTO) {
         // If the new flight violates the flight limit, we should not perform the action
         // Fetch current flight
-        Flight existingFlight = getFlightById(id);
+        Flight existingFlight = flightRepository.findById(id)
+                .orElseThrow(() -> new FlightNotFoundException(id));
 
         boolean isValidationRequired = hasFlightAttrChanged(existingFlight, requestDTO);
 
