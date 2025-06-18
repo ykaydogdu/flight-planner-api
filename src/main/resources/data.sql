@@ -21,39 +21,17 @@ INSERT INTO AIRPORT (code, name) VALUES ('JFK', 'John F. Kennedy Intl');
 INSERT INTO AIRPORT (code, name) VALUES ('DUB', 'Dublin Airport');
 INSERT INTO AIRPORT (code, name) VALUES ('LGW', 'London Gatwick');
 
--- Insert Roles
-INSERT INTO ROLE (id, name) VALUES (1, 'ROLE_ADMIN');
-INSERT INTO ROLE (id, name) VALUES (2, 'ROLE_USER');
-INSERT INTO ROLE (id, name) VALUES (3, 'ROLE_AIRLINE_STAFF');
-
 -- Insert Users with BCrypt hashed passwords
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (1, 'user1', '$2a$10$8OfJhM7qU1cyyzBvjeFJcuU1brZ/Y6UvNLdQnAYAYwV6FjP0c4WfO', 'user1@example.com'); -- pass1
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (2, 'admin1', '$2a$10$AYrPf4y4okz9fbF25.J1EO.Wh4UgDb/Nu2UPUvrs1MiN1.YCkDLaq', 'admin1@example.com'); -- pass2
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (3, 'user2', '$2a$10$8xPb7uDLg4Dr1MTy9Z2ZQuHMnhCKx5M/Vnk9Id3CvL6EvcyBuxUpy', 'user2@example.com'); -- pass3
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (4, 'user3', '$2a$10$DbFxRxExBMeI6n7S8aW3mOR3Y9oMYYnB5s6RB9Z86ZkjNOznOYmE6', 'user3@example.com'); -- pass4
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (5, 'admin2', '$2a$10$hK9LU4JZyIjZV6WthZt9iOKND/bvHtHg0IPprT7KX37u3MVVDEZBq', 'admin2@example.com'); -- pass5
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (6, 'superadmin1', '$2a$10$sJ8T8rwvDJ2XsSJDq0zO0.VRIGkIGu4AWYFRfjnhchZev.Kq8jc1S', 'superadmin1@example.com'); -- pass6
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (7, 'user4', '$2a$10$4/UOhZ9CeQiQF9TpoU0wze2kDJ/og9BqFtJAj0aEG2.v8pPeEVx1y', 'user4@example.com'); -- pass7
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (8, 'user5', '$2a$10$ZyMwNSlYcX06FxVdJrRYMeUPR0kCtzYxwN6aGjV4zIhJP7EXWhCAW', 'user5@example.com'); -- pass8
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (9, 'admin3', '$2a$10$7bsZkZKwA0.MR29DSl0z7Ood/qV4blkuX5s6OjwZpQ2Mz07ISYZCW', 'admin3@example.com'); -- pass9
-INSERT INTO APP_USER (id, username, hashed_password, email) VALUES (10, 'user6', '$2a$10$YBQKH7HSAU2XoWIkylmgoeQOWZn.Xb6qx3RU7VvMsXjNRgBoZpNgS', 'user6@example.com'); -- pass10
-
-
--- Insert User Roles
-INSERT INTO user_roles (user_id, role_id) VALUES (1, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (2, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (2, 2);
-INSERT INTO user_roles (user_id, role_id) VALUES (3, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (4, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (5, 2);
-INSERT INTO user_roles (user_id, role_id) VALUES (5, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (6, 3);
-INSERT INTO user_roles (user_id, role_id) VALUES (6, 2);
-INSERT INTO user_roles (user_id, role_id) VALUES (7, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (8, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (9, 2);
-INSERT INTO user_roles (user_id, role_id) VALUES (9, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (10, 1);
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (1, 'user1', '$2y$12$zkiAcfx1qwgxVPxKTbzbl.j7u9wfrUtyfjO/e4u414mZMDmimcrtG', 'user1@example.com', 'ROLE_USER'); -- pass1
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (2, 'admin1', '$2y$12$mr/xmdBFqZJKe79x6WNGruc9qx9xTV8xX0HRsGtIzfaIg6xl3GACG', 'admin1@example.com', 'ROLE_ADMIN'); -- pass2
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (3, 'user2', '$2y$12$Xwx.qGQe7Vupvre70r1OU.n3757uBzI0zrwVbbtShLpyDUzvbgnue', 'user2@example.com', 'ROLE_USER'); -- pass3
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (4, 'user3', '$2y$12$sG/BXQwdLwNTWCL8NoxhPuOnt2lXqhgX64DBSeW4h5r8oPjNegnee', 'user3@example.com', 'ROLE_USER'); -- pass4
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (5, 'admin2', '$2y$12$zNf7czeuW4Nff7rrsDBt9.Thh1l9SM9dNwWaeEchCnQuMHNRdM3Z.', 'admin2@example.com', 'ROLE_ADMIN'); -- pass5
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (6, 'staff1', '$2y$12$svLcCLqA/ZFrkjr4RGGRg.vG6t7mdf.dyz.hLUjv.CCFNPBy1Gxc.', 'staff1@example.com', 'ROLE_AIRLINE_STAFF'); -- pass6
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (7, 'user4', '$2y$12$wmxhO8axePI7R4oweApq9e6roXcSZB3aPu4jB2FvBXOBfYVMESUla', 'user4@example.com', 'ROLE_USER'); -- pass7
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (8, 'user5', '$2y$12$CIFZ1.lxBYbN1.yXLAkane9tF09vhI88H5sF0pUcFGdyyDDAApKmi', 'user5@example.com', 'ROLE_USER'); -- pass8
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (9, 'admin3', '$2y$12$AKBMh07xI5PH.X9FzIrDTOafLFzL.MF444ChpZnioNV0WnUy9xzjS', 'admin3@example.com', 'ROLE_ADMIN'); -- pass9
+INSERT INTO APP_USER (id, username, hashed_password, email, role) VALUES (10, 'user6', '$2y$12$W0htFDH09d5ajinx8zjeSOBZHEnkuPyAX3w0ktehVfrEnAcB8pzmO', 'user6@example.com', 'ROLE_USER'); -- pass10
 
 -- Insert Flights
 INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (1, '2025-06-20 09:00:00', 'THY', 'IST', 'LHR');

@@ -1,6 +1,5 @@
-package com.flightplanner.api.auth;
+package com.flightplanner.api.auth.user;
 
-import com.flightplanner.api.role.Role;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
@@ -10,10 +9,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "app_user")
@@ -35,15 +33,15 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    public User(String username, String hashedPassword, String email, Set<Role> roles) {
+    public User(String username, String hashedPassword) {
+        this.username = username;
+        this.hashedPassword = hashedPassword;
+    }
+
+    public User(String username, String hashedPassword, String email, Role role) {
         // Email format check
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -56,15 +54,13 @@ public class User implements UserDetails {
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
     }
 
     // UserDetails methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                .collect(Collectors.toList());
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
