@@ -1,6 +1,6 @@
 package com.flightplanner.api.role;
 
-import com.flightplanner.api.user.User;
+import com.flightplanner.api.auth.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

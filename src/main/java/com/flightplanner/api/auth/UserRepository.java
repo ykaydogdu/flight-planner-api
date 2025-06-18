@@ -1,4 +1,4 @@
-package com.flightplanner.api.user;
+package com.flightplanner.api.auth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.flightplanner.api.user;
+package com.flightplanner.api.auth;
 
 import com.flightplanner.api.role.Role;
 import jakarta.persistence.*;
