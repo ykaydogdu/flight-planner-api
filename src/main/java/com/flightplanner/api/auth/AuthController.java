@@ -1,7 +1,7 @@
 package com.flightplanner.api.auth;
 
 import com.flightplanner.api.auth.dto.AuthResponseDTO;
-import com.flightplanner.api.auth.dto.LoginRequestDTO;
+import com.flightplanner.api.auth.dto.AuthRequestDTO;
 import com.flightplanner.api.auth.user.User;
 import com.flightplanner.api.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +25,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestParam String username, @RequestParam String password) {
-        User user = authService.registerUser(username, password);
+    public ResponseEntity<String> registerUser(@RequestBody AuthRequestDTO registerRequest) {
+        User user = authService.registerUser(registerRequest.getUsername(), registerRequest.getPassword());
         return new ResponseEntity<>(user.getUsername(), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<AuthResponseDTO> loginUser(@RequestBody AuthRequestDTO loginRequest) {
         AuthResponseDTO authResponse = authService.authenticateAndGetJwt(loginRequest.getUsername(), loginRequest.getPassword());
         return ResponseEntity.ok(authResponse);
     }

@@ -2,6 +2,7 @@ package com.flightplanner.api.auth;
 
 import com.flightplanner.api.auth.dto.AuthResponseDTO;
 import com.flightplanner.api.auth.jwt.JwtService;
+import com.flightplanner.api.auth.user.Role;
 import com.flightplanner.api.auth.user.User;
 import com.flightplanner.api.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class AuthService {
         }
         String encodedPassword = bCryptPasswordEncoder.encode(password);
         User user = new User(username, encodedPassword);
+        user.setRole(Role.ROLE_USER);
         return userRepository.save(user);
     }
 
