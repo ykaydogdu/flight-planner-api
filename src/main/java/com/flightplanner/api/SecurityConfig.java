@@ -4,6 +4,7 @@ import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -34,11 +35,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll() // registration endpoints
-                        .requestMatchers("/swagger-ui/**").permitAll() // swagger is open for testing
+                        // Allow unauthenticated access for these paths
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated() // others require auth
+
+                        // Specific roles for specific HTTP methods and paths
+                        .requestMatchers(HttpMethod.POST, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
+
+                        // Admin can do anything
+                        .requestMatchers("/**").hasRole("ADMIN") // Admin can access any path
+
+                        // All other requests require authentication
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider(userDetailsService))
