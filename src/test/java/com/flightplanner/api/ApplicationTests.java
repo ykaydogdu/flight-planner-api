@@ -28,7 +28,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -107,7 +107,6 @@ class ApplicationTests {
 
         String requestJson = objectMapper.writeValueAsString(requestDTO);
 
-        // Perform POST request to create a flight
         mockMvc.perform(post("/api/v1/flights/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -116,12 +115,8 @@ class ApplicationTests {
                 .andExpect(jsonPath("$.airlineCode", is("TK")))
                 .andExpect(jsonPath("$.srcAirportCode", is("SAW")));
 
-        // Act & Assert
         // After creation, we expect one flight in the database
         List<Flight> allFlights = flightRepository.findAll();
-        // Since we are using FlightResponseDTO, the id is mapped after save.
-        // It's more robust to fetch the ID from the response if possible,
-        // or just rely on findAll().
         Long createdFlightId = allFlights.getFirst().getId(); // Get the ID of the first (and only) flight
 
         mockMvc.perform(get("/api/v1/flights/{id}", createdFlightId))
@@ -147,4 +142,24 @@ class ApplicationTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0))); // Expect an empty array
     }
+
+    @Test
+    void testApplicationContextLoads() {
+        assertNotNull(mockMvc);
+        assertNotNull(airlineRepository);
+        assertNotNull(airportRepository);
+        assertNotNull(flightRepository);
+        assertNotNull(objectMapper);
+        assertNotNull(jwtAuthenticationFilter);
+        assertNotNull(jwtService);
+        assertNotNull(authController);
+        assertNotNull(authService);
+    }
+
+    @Test
+    void testMockMvcIsConfigured() throws Exception {
+        mockMvc.perform(get("/api/v1/airlines/").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
+

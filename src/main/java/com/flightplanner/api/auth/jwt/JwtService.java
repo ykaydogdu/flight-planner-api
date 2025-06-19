@@ -18,10 +18,10 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    String SECRET_KEY;
 
     @Value("${jwt.expiration-time}") // 24 hr
-    private int JWT_EXPIRATION_MS;
+    int JWT_EXPIRATION_MS;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -32,7 +32,7 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()

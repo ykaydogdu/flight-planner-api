@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,6 +41,9 @@ public class AuthController {
     @GetMapping("/protected")
     public ResponseEntity<String> protectedSource() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+        }
         String username = authentication.getName();
         return ResponseEntity.ok("Hello from the protected source: " + username);
     }
@@ -49,7 +53,7 @@ public class AuthController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User usr = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not founds"));
+            .orElseThrow(() -> new UsernameNotFoundException("User not founds"));
         return ResponseEntity.ok(usr);
     }
 }

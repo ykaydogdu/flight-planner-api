@@ -5,6 +5,8 @@ import com.flightplanner.api.auth.jwt.JwtService;
 import com.flightplanner.api.auth.user.Role;
 import com.flightplanner.api.auth.user.User;
 import com.flightplanner.api.auth.user.UserRepository;
+import com.flightplanner.api.auth.user.exception.InvalidCredentialsException;
+import com.flightplanner.api.auth.user.exception.UserAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,9 +43,17 @@ public class AuthService {
      * @return The created user entity
      */
     public User registerUser(final String username, final String password) {
-        if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username " + username + " already exists");
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
         }
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+
+        if (userRepository.existsByUsername(username)) {
+            throw new UserAlreadyExistsException("Username " + username + " already exists");
+        }
+
         String encodedPassword = bCryptPasswordEncoder.encode(password);
         User user = new User(username, encodedPassword);
         user.setRole(Role.ROLE_USER);
@@ -62,17 +72,21 @@ public class AuthService {
      */
     public AuthResponseDTO authenticateAndGetJwt(String username, String password) {
         // authenticate the user
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
 
-        // retrieve user details
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+            // retrieve user details
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
-        // generate token
-        String jwt = jwtService.generateToken(userDetails);
+            // generate token
+            String jwt = jwtService.generateToken(userDetails);
 
-        return new AuthResponseDTO(jwt);
+            return new AuthResponseDTO(jwt);
+        } catch (RuntimeException ex) {
+            throw new InvalidCredentialsException();
+        }
     }
 
 
