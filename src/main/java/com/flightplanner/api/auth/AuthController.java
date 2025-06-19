@@ -56,22 +56,4 @@ public class AuthController {
             .orElseThrow(() -> new UsernameNotFoundException("User not founds"));
         return ResponseEntity.ok(usr);
     }
-
-    @PatchMapping("/{username}/assign-role")
-    public ResponseEntity<String> assignRoleToUser(@PathVariable String username, @RequestParam String role) {
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException(username));
-        authService.assignRoleToUser(user, role);
-        return ResponseEntity.ok("Role " + role + " assigned to user " + username);
-    }
-
-
-    @PatchMapping("/assign-airline")
-    public ResponseEntity<String> assignAirlineToUser(@RequestParam String username, @RequestParam String airlineCode) {
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException(username));
-        authService.assignAirlineToUser(user, airlineCode);
-        return ResponseEntity.ok("Airline " + airlineCode + " assigned to user " + username);
-    }
-
 }
