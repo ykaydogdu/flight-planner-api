@@ -1,5 +1,6 @@
 package com.flightplanner.api;
 
+import com.flightplanner.api.auth.jwt.JwtAuthenticationEntryPoint;
 import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,11 +24,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfig(final JwtAuthenticationFilter jwtAuthFilter, final UserDetailsService userDetailsService) {
+    public SecurityConfig(final JwtAuthenticationFilter jwtAuthFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, final UserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.userDetailsService = userDetailsService;
     }
 
@@ -36,6 +39,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests( auth -> auth
                         // Allow unauthenticated access for these paths
                         .requestMatchers("/api/v1/auth/**").permitAll()
