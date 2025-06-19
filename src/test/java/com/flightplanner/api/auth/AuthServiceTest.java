@@ -1,9 +1,9 @@
 package com.flightplanner.api.auth;
 
-import com.flightplanner.api.auth.user.User;
-import com.flightplanner.api.auth.user.UserRepository;
-import com.flightplanner.api.auth.user.Role;
-import com.flightplanner.api.auth.user.exception.UserAlreadyExistsException;
+import com.flightplanner.api.user.User;
+import com.flightplanner.api.user.UserRepository;
+import com.flightplanner.api.user.Role;
+import com.flightplanner.api.user.exception.UserAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

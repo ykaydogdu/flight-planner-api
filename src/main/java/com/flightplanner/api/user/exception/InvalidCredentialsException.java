@@ -1,4 +1,4 @@
-package com.flightplanner.api.auth.user.exception;
+package com.flightplanner.api.user.exception;
 
 public class InvalidCredentialsException extends RuntimeException {
     public InvalidCredentialsException() {

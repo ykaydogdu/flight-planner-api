@@ -1,4 +1,4 @@
-package com.flightplanner.api.auth.user.exception;
+package com.flightplanner.api.user.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

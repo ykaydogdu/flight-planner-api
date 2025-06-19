@@ -1,5 +1,6 @@
-package com.flightplanner.api.auth.user;
+package com.flightplanner.api.user;
 
+import com.flightplanner.api.airline.Airline;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,11 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @JoinColumn(name = "airline_code", referencedColumnName = "code")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Airline airline;
+
 
     public User(String username, String hashedPassword) {
         this.username = username;

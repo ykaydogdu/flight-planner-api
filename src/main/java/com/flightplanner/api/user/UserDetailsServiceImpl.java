@@ -1,4 +1,4 @@
-package com.flightplanner.api.auth.user;
+package com.flightplanner.api.user;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

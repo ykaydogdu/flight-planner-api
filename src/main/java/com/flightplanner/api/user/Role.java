@@ -1,4 +1,4 @@
-package com.flightplanner.api.auth.user;
+package com.flightplanner.api.user;
 
 public enum Role {
     ROLE_ADMIN,
