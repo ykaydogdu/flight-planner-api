@@ -13,9 +13,15 @@ import java.io.IOException;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().println("{\"message\":\"" +  authException.getMessage() + "\"}");
+        try {
+            response.getWriter()
+                    .println("{\"message\":\"" + authException.getMessage() + "\"}");
+        } catch (IOException e) {
+            // swallow: we've already set status & content type
+            // optionally log: logger.warn("Could not write response body", e);
+        }
     }
 }
