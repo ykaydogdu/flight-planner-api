@@ -2,8 +2,7 @@ package com.flightplanner.api.flight;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.flightplanner.api.airline.AirlineService;
-import com.flightplanner.api.airport.AirportService;
+import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest
+@WebMvcTest(FlightController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class FlightControllerTest {
 
@@ -39,11 +38,9 @@ class FlightControllerTest {
     @MockitoBean
     private FlightService flightService;
     @MockitoBean
-    private AirlineService airlineService;
-    @MockitoBean
-    private AirportService airportService;
-    @MockitoBean
     private FlightMapper flightMapper;
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private ObjectMapper objectMapper;

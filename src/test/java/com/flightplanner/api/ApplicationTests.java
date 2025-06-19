@@ -6,7 +6,11 @@ import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airline.AirlineRepository;
 import com.flightplanner.api.airport.Airport;
 import com.flightplanner.api.airport.AirportRepository;
-import com.flightplanner.api.flight.Flight; // Assuming Flight entity is used
+import com.flightplanner.api.auth.AuthController;
+import com.flightplanner.api.auth.AuthService;
+import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
+import com.flightplanner.api.auth.jwt.JwtService;
+import com.flightplanner.api.flight.Flight;
 import com.flightplanner.api.flight.FlightRepository;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -34,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // @SpringBootTest loads the full Spring application context
 // webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT starts the embedded server on a random port
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc // Configures MockMvc for web layer testing with the full context
+@AutoConfigureMockMvc(addFilters = false) // Configures MockMvc for web layer testing with the full context
 @ActiveProfiles("test") // Activates the 'test' profile (e.g., for H2 database config)
 class ApplicationTests {
 
@@ -52,6 +57,15 @@ class ApplicationTests {
 
     @Autowired
     private ObjectMapper objectMapper; // For JSON conversion
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private JwtService jwtService;
+    @MockitoBean
+    private AuthController authController;
+    @MockitoBean
+    private AuthService authService;
 
     @BeforeEach
     void setUp() {
