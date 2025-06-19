@@ -27,8 +27,8 @@ public class User implements UserDetails {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "hashed_password")
-    private String hashedPassword;
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "email")
     private String email;
@@ -38,7 +38,7 @@ public class User implements UserDetails {
 
     public User(String username, String hashedPassword) {
         this.username = username;
-        this.hashedPassword = hashedPassword;
+        this.password = hashedPassword;
     }
 
     public User(String username, String hashedPassword, String email, Role role) {
@@ -52,7 +52,7 @@ public class User implements UserDetails {
         }
 
         this.username = username;
-        this.hashedPassword = hashedPassword;
+        this.password = hashedPassword;
         this.email = email;
         this.role = role;
     }
@@ -65,6 +65,6 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return hashedPassword;
+        return password;
     }
 }

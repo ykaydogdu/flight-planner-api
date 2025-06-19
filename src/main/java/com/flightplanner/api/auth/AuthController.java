@@ -3,6 +3,7 @@ package com.flightplanner.api.auth;
 import com.flightplanner.api.auth.dto.AuthResponseDTO;
 import com.flightplanner.api.auth.dto.LoginRequestDTO;
 import com.flightplanner.api.auth.user.User;
+import com.flightplanner.api.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AuthController(final AuthService authService) {
+    public AuthController(final AuthService authService, UserRepository userRepository) {
         this.authService = authService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/register")
@@ -39,5 +42,14 @@ public class AuthController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return ResponseEntity.ok("Hello from the protected source: " + username);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<User> me() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User usr = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not founds"));
+        return ResponseEntity.ok(usr);
     }
 }

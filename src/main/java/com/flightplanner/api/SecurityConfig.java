@@ -41,13 +41,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
 
                         // Specific roles for specific HTTP methods and paths
                         .requestMatchers(HttpMethod.POST, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
 
                         // Admin can do anything
-                        .requestMatchers("/**").hasRole("ADMIN") // Admin can access any path
+//                        .requestMatchers("/**").hasRole("ADMIN") // Admin can access any path
 
                         // All other requests require authentication
                         .anyRequest().authenticated()
