@@ -27,20 +27,20 @@ INSERT INTO APP_USER (id, username, password, email, role) VALUES (2, 'admin1', 
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (3, 'user2', '$2y$12$Xwx.qGQe7Vupvre70r1OU.n3757uBzI0zrwVbbtShLpyDUzvbgnue', 'user2@example.com', 'ROLE_USER'); -- pass3
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (4, 'user3', '$2y$12$sG/BXQwdLwNTWCL8NoxhPuOnt2lXqhgX64DBSeW4h5r8oPjNegnee', 'user3@example.com', 'ROLE_USER'); -- pass4
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (5, 'admin2', '$2y$12$zNf7czeuW4Nff7rrsDBt9.Thh1l9SM9dNwWaeEchCnQuMHNRdM3Z.', 'admin2@example.com', 'ROLE_ADMIN'); -- pass5
-INSERT INTO APP_USER (id, username, password, email, role) VALUES (6, 'staff1', '$2y$12$svLcCLqA/ZFrkjr4RGGRg.vG6t7mdf.dyz.hLUjv.CCFNPBy1Gxc.', 'staff1@example.com', 'ROLE_AIRLINE_STAFF'); -- pass6
+INSERT INTO APP_USER (id, username, password, email, role, airline_code) VALUES (6, 'staff1', '$2y$12$svLcCLqA/ZFrkjr4RGGRg.vG6t7mdf.dyz.hLUjv.CCFNPBy1Gxc.', 'staff1@example.com', 'ROLE_AIRLINE_STAFF', 'THY'); -- pass6
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (7, 'user4', '$2y$12$wmxhO8axePI7R4oweApq9e6roXcSZB3aPu4jB2FvBXOBfYVMESUla', 'user4@example.com', 'ROLE_USER'); -- pass7
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (8, 'user5', '$2y$12$CIFZ1.lxBYbN1.yXLAkane9tF09vhI88H5sF0pUcFGdyyDDAApKmi', 'user5@example.com', 'ROLE_USER'); -- pass8
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (9, 'admin3', '$2y$12$AKBMh07xI5PH.X9FzIrDTOafLFzL.MF444ChpZnioNV0WnUy9xzjS', 'admin3@example.com', 'ROLE_ADMIN'); -- pass9
 INSERT INTO APP_USER (id, username, password, email, role) VALUES (10, 'user6', '$2y$12$W0htFDH09d5ajinx8zjeSOBZHEnkuPyAX3w0ktehVfrEnAcB8pzmO', 'user6@example.com', 'ROLE_USER'); -- pass10
 
 -- Insert Flights
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (1, '2025-06-20 09:00:00', 'THY', 'IST', 'LHR');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (2, '2025-06-21 14:30:00', 'PGS', 'SAW', 'CDG');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (3, '2025-06-22 12:00:00', 'THY', 'IST', 'JFK');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (4, '2025-06-19 07:45:00', 'EZY', 'LGW', 'AMS');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (5, '2025-06-23 11:15:00', 'RYR', 'DUB', 'FRA');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (6, '2025-06-24 10:00:00', 'BAW', 'LHR', 'IST');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (7, '2025-06-25 16:00:00', 'AFL', 'SVO', 'SAW');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (8, '2025-06-20 13:30:00', 'DLH', 'FRA', 'CDG');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (9, '2025-06-21 18:15:00', 'AFR', 'CDG', 'AMS');
-INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code) VALUES (10, '2025-06-22 21:00:00', 'KLM', 'AMS', 'IST');
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (1, '2025-06-20 09:00:00', 'THY', 'IST', 'LHR', 150.00, 50);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (2, '2025-06-21 14:30:00', 'PGS', 'SAW', 'CDG', 120.00, 30);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (3, '2025-06-22 12:00:00', 'THY', 'IST', 'JFK', 300.00, 20);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (4, '2025-06-19 07:45:00', 'EZY', 'LGW', 'AMS', 80.00, 100);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (5, '2025-06-23 11:15:00', 'RYR', 'DUB', 'FRA', 90.00, 70);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (6, '2025-06-24 10:00:00', 'BAW', 'LHR', 'IST', 200.00, 40);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (7, '2025-06-25 16:00:00', 'AFL', 'SVO', 'SAW', 250.00, 60);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (8, '2025-06-20 13:30:00', 'DLH', 'FRA', 'CDG', 180.00, 80);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (9, '2025-06-21 18:15:00', 'AFR', 'CDG', 'AMS', 160.00, 90);
+INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (10, '2025-06-22 21:00:00', 'KLM', 'AMS', 'IST', 220.00, 25);

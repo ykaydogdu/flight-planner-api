@@ -23,6 +23,12 @@ public class Flight {
     @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
 
+    @Column(name = "price", nullable = false)
+    private double price;
+
+    @Column(name = "seat_count", nullable = false)
+    private int seatCount;
+
     @ManyToOne
     @JoinColumn(name = "airline_code", nullable = false, referencedColumnName = "code")
     private Airline airline;

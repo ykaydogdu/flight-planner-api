@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FlightRequestDTO {
     private LocalDateTime departureTime;
+    private double price;
+    private int emptySeats;
     private String airlineCode;
     private String srcAirportCode;
     private String destAirportCode;
