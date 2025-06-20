@@ -76,7 +76,7 @@ public class AuthController {
     public ResponseEntity<User> me() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User usr = userRepository.findByUsername(username)
+        User usr = userRepository.findById(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not founds"));
         return ResponseEntity.ok(usr);
     }

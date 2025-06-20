@@ -68,7 +68,7 @@ class BookingServiceTest {
     void createBooking_shouldSaveBookingAndReturnResponseDTO_whenSeatsAvailable() {
         // Arrange
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
         when(bookingRepository.countBookedSeatsForFlight(1L)).thenReturn(50);
         when(bookingRepository.save(any())).thenReturn(new Booking(1L, flight, user, 2));
 
@@ -87,7 +87,7 @@ class BookingServiceTest {
     void createBooking_shouldThrowException_whenSeatsNotAvailable() {
         // Arrange
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
         when(bookingRepository.countBookedSeatsForFlight(1L)).thenReturn(99);
 
         // Act & Assert
@@ -109,7 +109,7 @@ class BookingServiceTest {
     void createBooking_shouldThrowException_whenUserNotFound() {
         // Arrange
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
+        when(userRepository.findById("testUser")).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> bookingService.createBooking(bookingRequestDTO));

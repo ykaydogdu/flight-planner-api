@@ -142,7 +142,7 @@ public class FlightService {
     protected void validateAirlineStaffAuthorization(String airlineCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
         if (!user.getRole().name().equals("ROLE_AIRLINE_STAFF") || !user.getAirline().getCode().equals(airlineCode)) {
             throw new UnauthorizedActionException("You cannot alter the flights of another airline.");

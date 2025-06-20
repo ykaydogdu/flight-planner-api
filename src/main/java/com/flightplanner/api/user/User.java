@@ -2,7 +2,6 @@ package com.flightplanner.api.user;
 
 import com.flightplanner.api.airline.Airline;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,15 +19,10 @@ import java.util.regex.Pattern;
 @Entity
 @Table(name = "app_user")
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class User implements UserDetails {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @Column(name = "username")
     private String username;
 

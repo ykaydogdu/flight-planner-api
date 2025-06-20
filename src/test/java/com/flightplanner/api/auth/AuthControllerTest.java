@@ -213,7 +213,7 @@ public class AuthControllerTest {
         SecurityContextHolder.setContext(securityContext);
 
         User usr = new User(username, "testpwd");
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(usr));
+        when(userRepository.findById(username)).thenReturn(Optional.of(usr));
 
         mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isOk())
@@ -228,7 +228,7 @@ public class AuthControllerTest {
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findById(username)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isNotFound());

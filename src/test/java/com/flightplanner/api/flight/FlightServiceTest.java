@@ -145,7 +145,7 @@ class FlightServiceTest {
         String username = userEntity.getUsername();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
@@ -215,7 +215,7 @@ class FlightServiceTest {
         String username = userEntity.getUsername();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
@@ -251,7 +251,7 @@ class FlightServiceTest {
         String username = userEntity.getUsername();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
@@ -290,7 +290,7 @@ class FlightServiceTest {
         String username = userEntity.getUsername();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
@@ -340,7 +340,7 @@ class FlightServiceTest {
 
         // authorized user
         String username = userEntity.getUsername();
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
 
@@ -361,7 +361,7 @@ class FlightServiceTest {
         User user = new User(username, "password", "test@test.com", Role.ROLE_USER, null);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
 
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
@@ -375,7 +375,7 @@ class FlightServiceTest {
         Airline testAirline = new Airline("DL", "Delta Airlines");
         String username = "diffAirlineUser";
         User user = new User(username, "password", "test@test.com", Role.ROLE_AIRLINE_STAFF, testAirline);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
 
         // Mock security context and authentication
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -391,7 +391,7 @@ class FlightServiceTest {
     @Test
     void validateAirlineStaffAuthorization_shouldPass_whenUserIsAuthorizedAirlineStaff() {
         String username = userEntity.getUsername();
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 
         // Mock security context and authentication
         when(securityContext.getAuthentication()).thenReturn(authentication);

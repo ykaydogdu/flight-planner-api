@@ -26,7 +26,7 @@ public class BookingService {
     public BookingResponseDTO createBooking(BookingRequestDTO bookingRequestDTO) {
         Flight flight = flightRepository.findById(bookingRequestDTO.getFlightId())
                 .orElseThrow(() -> new NotFoundException("Flight"));
-        User user = userRepository.findByUsername(bookingRequestDTO.getUsername())
+        User user = userRepository.findById(bookingRequestDTO.getUsername())
                 .orElseThrow(() -> new NotFoundException("User"));
         if (bookingRequestDTO.getNumberOfSeats() <= 0) {
             throw new IllegalArgumentException("Invalid number of seats requested");

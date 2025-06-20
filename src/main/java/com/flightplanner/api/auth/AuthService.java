@@ -50,7 +50,7 @@ public class AuthService {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
 
-        if (userRepository.existsByUsername(username)) {
+        if (userRepository.existsById(username)) {
             throw new UserAlreadyExistsException("Username " + username + " already exists");
         }
 

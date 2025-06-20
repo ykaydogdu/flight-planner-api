@@ -1,5 +1,6 @@
 package com.flightplanner.api.user;
 
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.airline.AirlineRepository;
 import com.flightplanner.api.airline.Airline;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class UserServiceTest {
         User user = new User();
         user.setUsername(username);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
 
         userService.assignRoleToUser(username, role);
 
@@ -49,11 +50,11 @@ class UserServiceTest {
         String username = "nonExistentUser";
         String role = "ADMIN";
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findById(username)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> userService.assignRoleToUser(username, role));
+        Exception exception = assertThrows(NotFoundException.class, () -> userService.assignRoleToUser(username, role));
 
-        assertEquals("User not found with username: " + username, exception.getMessage());
+        assertEquals("User not found with parameters: username=" + username, exception.getMessage());
     }
 
     @Test
@@ -63,7 +64,7 @@ class UserServiceTest {
         User user = new User();
         user.setUsername(username);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> userService.assignRoleToUser(username, role));
 
@@ -79,7 +80,7 @@ class UserServiceTest {
         Airline airline = new Airline();
         airline.setCode(airlineCode);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
         when(airlineRepository.findById(airlineCode)).thenReturn(Optional.of(airline));
 
         userService.assignAirlineToUser(username, airlineCode);
@@ -93,11 +94,11 @@ class UserServiceTest {
         String username = "nonExistentUser";
         String airlineCode = "AA123";
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findById(username)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> userService.assignAirlineToUser(username, airlineCode));
+        Exception exception = assertThrows(NotFoundException.class, () -> userService.assignAirlineToUser(username, airlineCode));
 
-        assertEquals("User not found with username: " + username, exception.getMessage());
+        assertEquals("User not found with parameters: username=" + username, exception.getMessage());
     }
 
     @Test
@@ -107,7 +108,7 @@ class UserServiceTest {
         User user = new User();
         user.setUsername(username);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
         when(airlineRepository.findById(airlineCode)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(RuntimeException.class, () -> userService.assignAirlineToUser(username, airlineCode));

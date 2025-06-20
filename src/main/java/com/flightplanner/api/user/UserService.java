@@ -19,7 +19,7 @@ public class UserService {
     }
 
     public void assignRoleToUser(String username, String role) {
-        User user =  userRepository.findByUsername(username)
+        User user =  userRepository.findById(username)
                 .orElseThrow(() -> new NotFoundException("User", new HashMap<>(){{put("username", username);}}));
 
         if (role == null || role.isBlank()) {
@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public void assignAirlineToUser(String username, String airlineCode) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(username)
                 .orElseThrow(() -> new NotFoundException("User", new HashMap<>(){{put("username", username);}}));
         if (airlineCode == null || airlineCode.isBlank()) {
             throw new IllegalArgumentException("Airline code cannot be null or empty");

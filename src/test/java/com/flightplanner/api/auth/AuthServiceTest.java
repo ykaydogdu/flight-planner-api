@@ -40,7 +40,7 @@ class AuthServiceTest {
         String password = "testpassword";
         String encodedPassword = "encodedPassword";
 
-        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.existsById(username)).thenReturn(false);
         when(bCryptPasswordEncoder.encode(password)).thenReturn(encodedPassword);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -51,7 +51,7 @@ class AuthServiceTest {
         assertEquals(encodedPassword, user.getPassword());
         assertEquals(Role.ROLE_USER, user.getRole());
 
-        verify(userRepository).existsByUsername(username);
+        verify(userRepository).existsById(username);
         verify(bCryptPasswordEncoder).encode(password);
         verify(userRepository).save(any(User.class));
     }
@@ -61,11 +61,11 @@ class AuthServiceTest {
         String username = "testuser";
         String password = "testpassword";
 
-        when(userRepository.existsByUsername(username)).thenReturn(true);
+        when(userRepository.existsById(username)).thenReturn(true);
 
         assertThrows(UserAlreadyExistsException.class, () -> authService.registerUser(username, password));
 
-        verify(userRepository).existsByUsername(username);
+        verify(userRepository).existsById(username);
         verifyNoInteractions(bCryptPasswordEncoder);
         verifyNoInteractions(authenticationManager);
     }
