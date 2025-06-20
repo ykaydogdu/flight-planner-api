@@ -1,5 +1,6 @@
 package com.flightplanner.api.booking;
 
+import com.flightplanner.api.booking.exception.NotEnoughSeatsException;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
@@ -33,7 +34,7 @@ public class BookingService {
         // check for available seats
         int availableSeats = flight.getSeatCount() - bookingRepository.countBookedSeatsForFlight(bookingRequestDTO.getFlightId());
         if (availableSeats <= bookingRequestDTO.getNumberOfSeats()) {
-            throw new RuntimeException("Not enough seats available for this flight");
+            throw new NotEnoughSeatsException(flight.getId(), bookingRequestDTO.getNumberOfSeats(), availableSeats);
         }
 
         Booking booking = new Booking(flight, user, bookingRequestDTO.getNumberOfSeats());
