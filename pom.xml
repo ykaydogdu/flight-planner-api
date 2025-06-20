@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project for Spring Boot</description>
+	<artifactId>flight-planner-api</artifactId>
+	<version>0.0.5</version>
+	<name>flight-planner-api</name>
+	<description>A REST API for planning and booking flights.</description>
 	<url/>
 	<licenses>
 		<license/>
