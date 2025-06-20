@@ -1,6 +1,6 @@
 package com.flightplanner.api.airline;
 
-import com.flightplanner.api.airline.exception.AirlineNotFoundException;
+import com.flightplanner.api.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -64,7 +64,7 @@ class AirlineServiceTest {
     void testGetAirlineByCodeThrowsException() {
         when(airlineRepository.findById("AA")).thenReturn(Optional.empty());
 
-        assertThrows(AirlineNotFoundException.class, () -> airlineService.getAirlineByCode("AA"));
+        assertThrows(NotFoundException.class, () -> airlineService.getAirlineByCode("AA"));
 
         verify(airlineRepository).findById("AA");
     }

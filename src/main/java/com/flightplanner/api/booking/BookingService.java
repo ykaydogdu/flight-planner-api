@@ -1,5 +1,6 @@
 package com.flightplanner.api.booking;
 
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.booking.exception.NotEnoughSeatsException;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
@@ -24,9 +25,9 @@ public class BookingService {
 
     public BookingResponseDTO createBooking(BookingRequestDTO bookingRequestDTO) {
         Flight flight = flightRepository.findById(bookingRequestDTO.getFlightId())
-                .orElseThrow(() -> new RuntimeException("Flight not found"));
+                .orElseThrow(() -> new NotFoundException("Flight"));
         User user = userRepository.findByUsername(bookingRequestDTO.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User"));
         if (bookingRequestDTO.getNumberOfSeats() <= 0) {
             throw new IllegalArgumentException("Invalid number of seats requested");
         }
@@ -45,14 +46,14 @@ public class BookingService {
 
     public BookingResponseDTO getBookingById(Long id) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new NotFoundException("Booking"));
 
         return getBookingResponseDTO(booking);
     }
 
     public void deleteBooking(Long id) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new NotFoundException("Booking"));
         bookingRepository.delete(booking);
     }
 

@@ -1,8 +1,11 @@
 package com.flightplanner.api.user;
 
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airline.AirlineRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 
 @Service
 public class UserService {
@@ -17,7 +20,7 @@ public class UserService {
 
     public void assignRoleToUser(String username, String role) {
         User user =  userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+                .orElseThrow(() -> new NotFoundException("User", new HashMap<>(){{put("username", username);}}));
 
         if (role == null || role.isBlank()) {
             throw new IllegalArgumentException("Role cannot be null or empty");
@@ -36,14 +39,14 @@ public class UserService {
 
     public void assignAirlineToUser(String username, String airlineCode) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+                .orElseThrow(() -> new NotFoundException("User", new HashMap<>(){{put("username", username);}}));
         if (airlineCode == null || airlineCode.isBlank()) {
             throw new IllegalArgumentException("Airline code cannot be null or empty");
         }
 
         // Assuming AirlineRepository exists and has a method to find by code
         Airline airline = airlineRepository.findById(airlineCode)
-                .orElseThrow(() -> new RuntimeException("Airline not found"));
+                .orElseThrow(() -> new NotFoundException("Airline"));
 
         user.setAirline(airline);
         userRepository.save(user);

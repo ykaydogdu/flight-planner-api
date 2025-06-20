@@ -1,6 +1,6 @@
 package com.flightplanner.api.airport;
 
-import com.flightplanner.api.airport.exception.AirportNotFoundException;
+import com.flightplanner.api.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -64,7 +64,7 @@ class AirportServiceTest {
     void testGetAirportByCodeThrowsException() {
         when(airportRepository.findById("JFK")).thenReturn(Optional.empty());
 
-        assertThrows(AirportNotFoundException.class, () -> airportService.getAirportByCode("JFK"));
+        assertThrows(NotFoundException.class, () -> airportService.getAirportByCode("JFK"));
 
         verify(airportRepository).findById("JFK");
     }

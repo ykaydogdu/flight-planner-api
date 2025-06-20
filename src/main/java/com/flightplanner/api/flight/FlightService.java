@@ -1,10 +1,10 @@
 package com.flightplanner.api.flight;
 
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
-import com.flightplanner.api.flight.exception.FlightNotFoundException;
 import com.flightplanner.api.UnauthorizedActionException;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class FlightService {
     public FlightResponseDTO getFlightById(final Long id) {
         return flightMapper.toResponseDto(
                 flightRepository.findById(id)
-                        .orElseThrow(() -> new FlightNotFoundException(id)));
+                        .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}})));
     }
 
     @Transactional
@@ -62,7 +63,7 @@ public class FlightService {
     @Transactional
     public FlightResponseDTO updateFlight(final Long id, final FlightRequestDTO requestDTO) {
         Flight existingFlight = flightRepository.findById(id)
-                .orElseThrow(() -> new FlightNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}}));
 
         Flight updatedFlight = flightMapper.toEntity(requestDTO);
         // Validate that the user is authorized to update this flight
@@ -84,7 +85,7 @@ public class FlightService {
     @Transactional
     public void deleteFlight(final Long id) {
         Flight existingFlight = flightRepository.findById(id)
-                .orElseThrow(() -> new FlightNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}}));
         validateAirlineStaffAuthorization(existingFlight.getAirlineCode());
         flightRepository.deleteById(id);
     }

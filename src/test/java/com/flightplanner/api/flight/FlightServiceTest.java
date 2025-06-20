@@ -1,5 +1,6 @@
 package com.flightplanner.api.flight;
 
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.UnauthorizedActionException;
 import com.flightplanner.api.airline.Airline; // Assuming these are your entity classes
 import com.flightplanner.api.airport.Airport; // Assuming these are your entity classes
@@ -7,7 +8,6 @@ import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
-import com.flightplanner.api.flight.exception.FlightNotFoundException;
 import com.flightplanner.api.user.Role;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
@@ -119,13 +119,13 @@ class FlightServiceTest {
     }
 
     @Test
-    void getFlightById_shouldThrowFlightNotFoundException_whenNotFound() {
+    void getFlightById_shouldThrowNotFoundException_whenNotFound() {
         // Arrange
         Long nonExistentId = 99L;
         when(flightRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(FlightNotFoundException.class, () -> flightService.getFlightById(nonExistentId));
+        assertThrows(NotFoundException.class, () -> flightService.getFlightById(nonExistentId));
         verify(flightRepository, times(1)).findById(nonExistentId);
         verify(flightMapper, never()).toResponseDto(any(Flight.class)); // Mapper should not be called
     }
@@ -323,7 +323,7 @@ class FlightServiceTest {
         when(flightRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(FlightNotFoundException.class, () -> flightService.updateFlight(nonExistentId, flightRequestDTO));
+        assertThrows(NotFoundException.class, () -> flightService.updateFlight(nonExistentId, flightRequestDTO));
 
         // Verify no further calls
         verify(flightRepository, times(1)).findById(nonExistentId);

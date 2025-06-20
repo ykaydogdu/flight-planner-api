@@ -8,12 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class FlightAdvice {
 
-    @ExceptionHandler(FlightNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String flightNotFound(FlightNotFoundException ex) {
-        return ex.getMessage();
-    }
-
     @ExceptionHandler(FlightLimitExceededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String flightLimitExceeded(FlightLimitExceededException ex) {

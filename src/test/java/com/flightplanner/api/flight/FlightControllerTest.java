@@ -2,11 +2,11 @@ package com.flightplanner.api.flight;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
-import com.flightplanner.api.flight.exception.FlightNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -132,7 +133,9 @@ class FlightControllerTest {
         Long flightId = 99L; // Non-existent ID
 
         // Mock service behavior for not found scenario
-        when(flightService.getFlightById(flightId)).thenThrow(new FlightNotFoundException(flightId));
+        when(flightService.getFlightById(flightId)).thenThrow(new NotFoundException("Flight", new HashMap<>(){{
+            put("id", flightId);
+        }}));
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/flights/{id}", flightId))

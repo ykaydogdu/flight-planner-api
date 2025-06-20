@@ -1,9 +1,10 @@
 package com.flightplanner.api.airport;
 
-import com.flightplanner.api.airport.exception.AirportNotFoundException;
+import com.flightplanner.api.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -22,7 +23,7 @@ public class AirportService {
 
     public Airport getAirportByCode(String airportCode) {
         return airportRepository.findById(airportCode)
-                .orElseThrow(() -> new AirportNotFoundException(airportCode));
+                .orElseThrow(() -> new NotFoundException("Airport", new HashMap<>(){{put("code", airportCode);}}));
     }
 
     public Airport createAirport(Airport airport) {

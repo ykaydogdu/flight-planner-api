@@ -1,13 +1,14 @@
 package com.flightplanner.api.flight.dto;
 
+import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airline.AirlineRepository;
-import com.flightplanner.api.airline.exception.AirlineNotFoundException;
 import com.flightplanner.api.airport.Airport;
 import com.flightplanner.api.airport.AirportRepository;
-import com.flightplanner.api.airport.exception.AirportNotFoundException;
 import com.flightplanner.api.flight.Flight;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
 
 @Component
 public class FlightMapper {
@@ -46,11 +47,17 @@ public class FlightMapper {
         }
 
         Airline airline = airlineRepository.findById(dto.getAirlineCode())
-                .orElseThrow(() -> new AirlineNotFoundException(dto.getAirlineCode()));
+                .orElseThrow(() -> new NotFoundException("Airline", new HashMap<>(){{
+                    put("code", dto.getAirlineCode());
+                }}));
         Airport srcAirport = airportRepository.findById(dto.getSrcAirportCode())
-                .orElseThrow(() -> new AirportNotFoundException(dto.getSrcAirportCode()));
+                .orElseThrow(() -> new NotFoundException("Airport", new HashMap<>(){{
+                    put("code", dto.getSrcAirportCode());
+                }}));
         Airport destAirport = airportRepository.findById(dto.getDestAirportCode())
-                .orElseThrow(() -> new AirportNotFoundException(dto.getDestAirportCode()));
+                .orElseThrow(() -> new NotFoundException("Airport", new HashMap<>(){{
+                    put("code", dto.getDestAirportCode());
+                }}));
 
         return new Flight(
                 dto.getDepartureTime(),
