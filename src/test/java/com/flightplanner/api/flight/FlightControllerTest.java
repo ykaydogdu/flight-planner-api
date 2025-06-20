@@ -54,8 +54,8 @@ class FlightControllerTest {
     void getAllFlights_shouldReturnListOfFlights() throws Exception {
         // Arrange
         LocalDateTime now = LocalDateTime.now();
-        FlightResponseDTO flight1 = new FlightResponseDTO(1L, now, "THY", "IST", "SAW");
-        FlightResponseDTO flight2 = new FlightResponseDTO(2L, now.plusHours(2), "DL", "IST", "SAW");
+        FlightResponseDTO flight1 = new FlightResponseDTO(1L, 100, 100, now, "THY", "IST", "SAW");
+        FlightResponseDTO flight2 = new FlightResponseDTO(2L, 100, 100, now.plusHours(2), "DL", "IST", "SAW");
         List<FlightResponseDTO> allFlights = Arrays.asList(flight1, flight2);
 
         // Mock service behavior
@@ -83,8 +83,8 @@ class FlightControllerTest {
     void createFlight_shouldReturnCreatedStatusAndFlightResponseDTO() throws Exception {
         // Arrange
         LocalDateTime departureTime = LocalDateTime.now().plusDays(7);
-        FlightRequestDTO requestDTO = new FlightRequestDTO(departureTime, "UA", "ORD", "SFO");
-        FlightResponseDTO responseDTO = new FlightResponseDTO(3L, departureTime, "UA", "ORD", "SFO");
+        FlightRequestDTO requestDTO = new FlightRequestDTO(departureTime, 100, 100, "UA", "ORD", "SFO");
+        FlightResponseDTO responseDTO = new FlightResponseDTO(3L, 100, 100, departureTime, "UA", "ORD", "SFO");
 
         // Mock service behavior
         when(flightService.createFlight(any(FlightRequestDTO.class))).thenReturn(responseDTO);
@@ -108,7 +108,7 @@ class FlightControllerTest {
         // Arrange
         Long flightId = 4L;
         LocalDateTime now = LocalDateTime.now();
-        FlightResponseDTO responseDTO = new FlightResponseDTO(flightId, now, "AA", "DFW", "MIA");
+        FlightResponseDTO responseDTO = new FlightResponseDTO(flightId, 100, 100, now, "AA", "DFW", "MIA");
 
         // Mock service behavior
         when(flightService.getFlightById(flightId)).thenReturn(responseDTO);
@@ -147,8 +147,8 @@ class FlightControllerTest {
         // Arrange
         Long flightId = 5L;
         LocalDateTime updatedTime = LocalDateTime.now().plusDays(10);
-        FlightRequestDTO requestDTO = new FlightRequestDTO(updatedTime, "DL", "LAX", "SEA");
-        FlightResponseDTO responseDTO = new FlightResponseDTO(flightId, updatedTime, "DL", "LAX", "SEA");
+        FlightRequestDTO requestDTO = new FlightRequestDTO(updatedTime, 100, 100, "DL", "LAX", "SEA");
+        FlightResponseDTO responseDTO = new FlightResponseDTO(flightId, 100, 100, updatedTime, "DL", "LAX", "SEA");
 
         // Mock service behavior
         when(flightService.updateFlight(eq(flightId), any(FlightRequestDTO.class))).thenReturn(responseDTO);

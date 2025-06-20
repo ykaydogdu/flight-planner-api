@@ -60,30 +60,4 @@ public class FlightMapper {
         );
     }
 
-    /**
-     * Updates an existing Flight entity from a FlightRequestDTO.
-     */
-    public void updateEntityFromDto(FlightRequestDTO dto, Flight flight) {
-        if (dto == null || flight == null) {
-            return;
-        }
-
-        flight.setDepartureTime(dto.getDepartureTime());
-
-        // Set codes safely (assuming the related objects are non-null)
-        if (flight.getAirline() == null) {
-            flight.setAirline(new Airline());
-        }
-        flight.getAirline().setCode(dto.getAirlineCode());
-
-        if (flight.getSrcAirport() == null) {
-            flight.setSrcAirport(new Airport());
-        }
-        flight.getSrcAirport().setCode(dto.getSrcAirportCode());
-
-        if (flight.getDestAirport() == null) {
-            flight.setDestAirport(new Airport());
-        }
-        flight.getDestAirport().setCode(dto.getDestAirportCode());
-    }
 }

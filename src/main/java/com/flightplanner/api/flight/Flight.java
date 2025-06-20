@@ -52,4 +52,8 @@ public class Flight {
         this.srcAirport = srcAirport;
         this.destAirport = destAirport;
     }
+
+    public String getAirlineCode() {
+        return this.airline != null ? this.airline.getCode() : null;
+    }
 }

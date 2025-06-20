@@ -5,7 +5,13 @@ import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
 import com.flightplanner.api.flight.exception.FlightNotFoundException;
+import com.flightplanner.api.UnauthorizedActionException;
+import com.flightplanner.api.user.User;
+import com.flightplanner.api.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +28,13 @@ public class FlightService {
     private final FlightMapper flightMapper;
     private static final int MAX_DAILY_FLIGHTS = 3;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public FlightService(final FlightRepository flightRepository, final FlightMapper flightMapper) {
+    public FlightService(final FlightRepository flightRepository, final FlightMapper flightMapper, UserRepository userRepository) {
         this.flightRepository = flightRepository;
         this.flightMapper = flightMapper;
+        this.userRepository = userRepository;
     }
 
     public List<FlightResponseDTO> getAllFlights() {
@@ -45,26 +54,39 @@ public class FlightService {
     public FlightResponseDTO createFlight(final FlightRequestDTO requestDTO) {
         Flight flight = flightMapper.toEntity(requestDTO);
         validateFlightLimit(flight);
+        validateAirlineStaffAuthorization(flight.getAirlineCode());
         Flight createdFlight = flightRepository.save(flight);
         return flightMapper.toResponseDto(createdFlight);
     }
 
     @Transactional
     public FlightResponseDTO updateFlight(final Long id, final FlightRequestDTO requestDTO) {
-        // If the new flight violates the flight limit, we should not perform the action
-        // Fetch current flight
         Flight existingFlight = flightRepository.findById(id)
                 .orElseThrow(() -> new FlightNotFoundException(id));
 
-        boolean isValidationRequired = hasFlightAttrChanged(existingFlight, requestDTO);
-
-        if (isValidationRequired) {
-            Flight updatedFlight = flightMapper.toEntity(requestDTO);
+        Flight updatedFlight = flightMapper.toEntity(requestDTO);
+        // Validate that the user is authorized to update this flight
+        validateAirlineStaffAuthorization(existingFlight.getAirlineCode());
+        if (hasFlightAttrChanged(existingFlight, requestDTO)) {
             validateFlightLimit(updatedFlight);
         }
 
-        flightMapper.updateEntityFromDto(requestDTO, existingFlight);
-        return flightMapper.toResponseDto(existingFlight);
+        // If airline is changed, reject
+        if (!existingFlight.getAirlineCode().equals(requestDTO.getAirlineCode())) {
+            throw new UnauthorizedActionException("You cannot change airline of a flight.");
+        }
+
+        updatedFlight.setId(id);
+        Flight savedFlight = flightRepository.save(updatedFlight);
+        return flightMapper.toResponseDto(savedFlight);
+    }
+
+    @Transactional
+    public void deleteFlight(final Long id) {
+        Flight existingFlight = flightRepository.findById(id)
+                .orElseThrow(() -> new FlightNotFoundException(id));
+        validateAirlineStaffAuthorization(existingFlight.getAirlineCode());
+        flightRepository.deleteById(id);
     }
 
     /**
@@ -116,7 +138,13 @@ public class FlightService {
         }
     }
 
-    public void deleteFlight(final Long id) {
-        flightRepository.deleteById(id);
+    protected void validateAirlineStaffAuthorization(String airlineCode) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        if (!user.getRole().name().equals("ROLE_AIRLINE_STAFF") || !user.getAirline().getCode().equals(airlineCode)) {
+            throw new UnauthorizedActionException("You cannot alter the flights of another airline.");
+        }
     }
 }
