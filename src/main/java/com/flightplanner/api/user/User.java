@@ -2,9 +2,12 @@ package com.flightplanner.api.user;
 
 import com.flightplanner.api.airline.Airline;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +20,7 @@ import java.util.regex.Pattern;
 @Entity
 @Table(name = "app_user")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class User implements UserDetails {
@@ -39,6 +43,7 @@ public class User implements UserDetails {
 
     @JoinColumn(name = "airline_code", referencedColumnName = "code")
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Airline airline;
 
 
@@ -48,7 +53,7 @@ public class User implements UserDetails {
         this.role = Role.ROLE_USER;
     }
 
-    public User(String username, String hashedPassword, String email, Role role) {
+    public User(String username, String hashedPassword, String email, Role role, Airline airline) {
         // Email format check
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -62,6 +67,7 @@ public class User implements UserDetails {
         this.password = hashedPassword;
         this.email = email;
         this.role = role;
+        this.airline = airline;
     }
 
     // UserDetails methods
