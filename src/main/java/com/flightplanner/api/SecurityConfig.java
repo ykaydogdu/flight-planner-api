@@ -51,9 +51,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
 
+                        // User patching endpoints
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("ADMIN")
+
                         // Admin can do anything
 //                        .requestMatchers("/**").hasRole("ADMIN") // Admin can access any path
 
+
+                        // Fix errors
+                        .requestMatchers("/error").permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
