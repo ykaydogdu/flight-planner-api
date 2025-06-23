@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Flight {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
@@ -41,12 +41,19 @@ public class Flight {
     @JoinColumn(name = "dest_airport_code", nullable = false, referencedColumnName = "code")
     private Airport destAirport;
 
-    public Flight(final LocalDateTime departureTime, final Airline airline, final Airport srcAirport, final Airport destAirport) {
+    public Flight(final LocalDateTime departureTime,
+                  final double price,
+                  final int seatCount,
+                  final Airline airline,
+                  final Airport srcAirport,
+                  final Airport destAirport) {
         if (srcAirport == destAirport) {
             throw new IllegalArgumentException("Source and destination Airport are the same");
         }
 
         this.departureTime = departureTime;
+        this.price = price;
+        this.seatCount = seatCount;
 
         this.airline = airline;
         this.srcAirport = srcAirport;

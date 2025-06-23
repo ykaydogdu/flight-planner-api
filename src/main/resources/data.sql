@@ -44,3 +44,4 @@ INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_air
 INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (8, '2025-06-20 13:30:00', 'DLH', 'FRA', 'CDG', 180.00, 80);
 INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (9, '2025-06-21 18:15:00', 'AFR', 'CDG', 'AMS', 160.00, 90);
 INSERT INTO FLIGHT (id, departure_time, airline_code, src_airport_code, dest_airport_code, price, seat_count) VALUES (10, '2025-06-22 21:00:00', 'KLM', 'AMS', 'IST', 220.00, 25);
+ALTER TABLE FLIGHT ALTER COLUMN id RESTART WITH 11;
