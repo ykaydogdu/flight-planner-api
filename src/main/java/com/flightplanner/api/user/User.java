@@ -1,5 +1,6 @@
 package com.flightplanner.api.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flightplanner.api.airline.Airline;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public class User implements UserDetails {
 
     @JoinColumn(name = "airline_code", referencedColumnName = "code")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Airline airline;
 

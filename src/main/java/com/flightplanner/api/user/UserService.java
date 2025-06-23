@@ -51,4 +51,13 @@ public class UserService {
         user.setAirline(airline);
         userRepository.save(user);
     }
+
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findById(username)
+                .orElseThrow(() -> new NotFoundException("User", new HashMap<>(){{put("username", username);}}));
+    }
 }

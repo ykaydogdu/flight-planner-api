@@ -15,13 +15,13 @@ public class UserAdvice {
         return ex.getMessage();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(InvalidCredentialsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleInvalidCredentialsException(InvalidCredentialsException ex) {
         return ex.getMessage();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleUserNotFoundException(UsernameNotFoundException ex) {
         return ex.getMessage();

@@ -40,4 +40,26 @@ public class UserController {
         userService.assignAirlineToUser(username, airlineCode);
         return ResponseEntity.ok("Airline " + airlineCode + " assigned to user " + username);
     }
+
+    @GetMapping("/")
+    @Operation(summary = "Get all users", description = "Retrieves a list of all users in the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+    })
+    public ResponseEntity<Iterable<User>> getAllUsers() {
+        Iterable<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{username}")
+    @Operation(summary = "Get user by username", description = "Retrieves a user by their username.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+    })
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
+    }
+
 }
