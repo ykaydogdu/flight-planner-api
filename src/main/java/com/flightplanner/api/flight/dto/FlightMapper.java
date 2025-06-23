@@ -39,7 +39,6 @@ public class FlightMapper {
 
     /**
      * Converts a FlightRequestDTO to a Flight entity.
-     * Note: This does not set the ID, as that is generated upon creation.
      */
     public Flight toEntity(FlightRequestDTO dto) {
         if (dto == null) {
@@ -61,6 +60,8 @@ public class FlightMapper {
 
         return new Flight(
                 dto.getDepartureTime(),
+                dto.getPrice(),
+                dto.getSeatCount(),
                 airline,
                 srcAirport,
                 destAirport

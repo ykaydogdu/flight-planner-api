@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,8 +29,14 @@ public class FlightController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of flights"),
     })
-    ResponseEntity<List<FlightResponseDTO>> getAllFlights() {
-        return new ResponseEntity<>(flightService.getAllFlights(), HttpStatus.OK);
+    ResponseEntity<List<FlightResponseDTO>> getAllFlights(
+            @RequestParam(required = false) String airlineCode,
+            @RequestParam(required = false) String srcAirportCode,
+            @RequestParam(required = false) String destAirportCode,
+            @RequestParam(required = false) LocalDate departureDate
+    ) {
+        List<FlightResponseDTO> flights = flightService.getAllFlights(airlineCode, srcAirportCode, destAirportCode, departureDate);
+        return ResponseEntity.ok(flights);
     }
 
     @PostMapping("/")

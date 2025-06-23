@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class FlightRequestDTO {
     private LocalDateTime departureTime;
     private double price;
-    private int emptySeats;
+    private int seatCount;
     private String airlineCode;
     private String srcAirportCode;
     private String destAirportCode;

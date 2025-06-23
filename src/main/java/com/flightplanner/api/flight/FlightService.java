@@ -38,8 +38,17 @@ public class FlightService {
         this.userRepository = userRepository;
     }
 
-    public List<FlightResponseDTO> getAllFlights() {
-        List<Flight> flights = flightRepository.findAll();
+    public List<FlightResponseDTO> getAllFlights(String airlineCode,
+                                                 String srcAirportCode,
+                                                 String destAirportCode,
+                                                 LocalDate departureDate) {
+        List<Flight> flights = flightRepository.findFilteredFlights(
+                airlineCode,
+                srcAirportCode,
+                destAirportCode,
+                departureDate != null ? departureDate.atStartOfDay() : null,
+                departureDate != null ? departureDate.atTime(LocalTime.MAX) : null
+        );
         return flights.stream()
                 .map(flightMapper::toResponseDto)
                 .collect(Collectors.toList());
