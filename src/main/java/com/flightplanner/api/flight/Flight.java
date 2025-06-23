@@ -34,20 +34,20 @@ public class Flight {
     private Airline airline;
 
     @ManyToOne
-    @JoinColumn(name = "src_airport_code", nullable = false, referencedColumnName = "code")
-    private Airport srcAirport;
+    @JoinColumn(name = "origin_airport_code", nullable = false, referencedColumnName = "code")
+    private Airport originAirport;
 
     @ManyToOne
-    @JoinColumn(name = "dest_airport_code", nullable = false, referencedColumnName = "code")
-    private Airport destAirport;
+    @JoinColumn(name = "destination_airport_code", nullable = false, referencedColumnName = "code")
+    private Airport destinationAirport;
 
     public Flight(final LocalDateTime departureTime,
                   final double price,
                   final int seatCount,
                   final Airline airline,
-                  final Airport srcAirport,
-                  final Airport destAirport) {
-        if (srcAirport == destAirport) {
+                  final Airport originAirport,
+                  final Airport destinationAirport) {
+        if (originAirport == destinationAirport) {
             throw new IllegalArgumentException("Source and destination Airport are the same");
         }
 
@@ -56,8 +56,8 @@ public class Flight {
         this.seatCount = seatCount;
 
         this.airline = airline;
-        this.srcAirport = srcAirport;
-        this.destAirport = destAirport;
+        this.originAirport = originAirport;
+        this.destinationAirport = destinationAirport;
     }
 
     public String getAirlineCode() {

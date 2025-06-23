@@ -45,8 +45,8 @@ class BookingServiceTest {
     void setUp() {
         flight = new Flight();
         flight.setAirline(new Airline("THY", "Turkish Airlines"));
-        flight.setSrcAirport(new Airport("SAW", "Sabiha Gokcen Airport"));
-        flight.setDestAirport(new Airport("IST", "Istanbul Airport"));
+        flight.setOriginAirport(new Airport("SAW", "Sabiha Gokcen Airport"));
+        flight.setDestinationAirport(new Airport("IST", "Istanbul Airport"));
         flight.setId(1L);
         flight.setSeatCount(100);
 

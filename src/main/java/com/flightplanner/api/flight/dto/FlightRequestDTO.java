@@ -16,6 +16,6 @@ public class FlightRequestDTO {
     private double price;
     private int seatCount;
     private String airlineCode;
-    private String srcAirportCode;
-    private String destAirportCode;
+    private String originAirportCode;
+    private String destinationAirportCode;
 }

@@ -31,11 +31,11 @@ public class FlightController {
     })
     ResponseEntity<List<FlightResponseDTO>> getAllFlights(
             @RequestParam(required = false) String airlineCode,
-            @RequestParam(required = false) String srcAirportCode,
-            @RequestParam(required = false) String destAirportCode,
+            @RequestParam(required = false) String originAirportCode,
+            @RequestParam(required = false) String destinationAirportCode,
             @RequestParam(required = false) LocalDate departureDate
     ) {
-        List<FlightResponseDTO> flights = flightService.getAllFlights(airlineCode, srcAirportCode, destAirportCode, departureDate);
+        List<FlightResponseDTO> flights = flightService.getAllFlights(airlineCode, originAirportCode, destinationAirportCode, departureDate);
         return ResponseEntity.ok(flights);
     }
 

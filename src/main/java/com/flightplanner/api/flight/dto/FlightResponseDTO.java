@@ -17,6 +17,6 @@ public class FlightResponseDTO {
     private int emptySeats;
     private LocalDateTime departureTime;
     private String airlineCode;
-    private String srcAirportCode;
-    private String destAirportCode;
+    private String originAirportCode;
+    private String destinationAirportCode;
 }

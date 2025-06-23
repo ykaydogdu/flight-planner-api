@@ -18,7 +18,7 @@ public class BookingResponseDTO {
     private double price;
     private int numberOfSeats;
     private String airlineCode;
-    private String srcAirportCode;
-    private String destAirportCode;
+    private String originAirportCode;
+    private String destinationAirportCode;
     private LocalDateTime departureTime;
 }

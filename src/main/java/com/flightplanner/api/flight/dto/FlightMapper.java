@@ -32,8 +32,8 @@ public class FlightMapper {
         dto.setId(flight.getId());
         dto.setDepartureTime(flight.getDepartureTime());
         dto.setAirlineCode(flight.getAirline().getCode());
-        dto.setSrcAirportCode(flight.getSrcAirport().getCode());
-        dto.setDestAirportCode(flight.getDestAirport().getCode());
+        dto.setOriginAirportCode(flight.getOriginAirport().getCode());
+        dto.setDestinationAirportCode(flight.getDestinationAirport().getCode());
         return dto;
     }
 
@@ -49,13 +49,13 @@ public class FlightMapper {
                 .orElseThrow(() -> new NotFoundException("Airline", new HashMap<>(){{
                     put("code", dto.getAirlineCode());
                 }}));
-        Airport srcAirport = airportRepository.findById(dto.getSrcAirportCode())
+        Airport originAirport = airportRepository.findById(dto.getOriginAirportCode())
                 .orElseThrow(() -> new NotFoundException("Airport", new HashMap<>(){{
-                    put("code", dto.getSrcAirportCode());
+                    put("code", dto.getOriginAirportCode());
                 }}));
-        Airport destAirport = airportRepository.findById(dto.getDestAirportCode())
+        Airport destinationAirport = airportRepository.findById(dto.getDestinationAirportCode())
                 .orElseThrow(() -> new NotFoundException("Airport", new HashMap<>(){{
-                    put("code", dto.getDestAirportCode());
+                    put("code", dto.getDestinationAirportCode());
                 }}));
 
         return new Flight(
@@ -63,8 +63,8 @@ public class FlightMapper {
                 dto.getPrice(),
                 dto.getSeatCount(),
                 airline,
-                srcAirport,
-                destAirport
+                originAirport,
+                destinationAirport
         );
     }
 

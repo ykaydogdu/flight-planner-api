@@ -157,8 +157,8 @@ class FlightServiceTest {
         verify(flightMapper, times(1)).toEntity(flightRequestDTO); // Mapper converts request DTO to entity
         verify(flightRepository, times(1)).dailyFlightCount(
                 eq(flightEntity.getAirline().getCode()),
-                eq(flightEntity.getSrcAirport().getCode()),
-                eq(flightEntity.getDestAirport().getCode()),
+                eq(flightEntity.getOriginAirport().getCode()),
+                eq(flightEntity.getDestinationAirport().getCode()),
                 any(LocalDateTime.class),
                 any(LocalDateTime.class)
         ); // Validate limit check is done
@@ -284,8 +284,8 @@ class FlightServiceTest {
         updatedFlightEntityForValidation.setId(flightId);
         updatedFlightEntityForValidation.setDepartureTime(newDepartureTime);
         updatedFlightEntityForValidation.setAirline(new Airline("THY", "Delta"));
-        updatedFlightEntityForValidation.setSrcAirport(new Airport("LAX", "Los Angeles"));
-        updatedFlightEntityForValidation.setDestAirport(new Airport("SEA", "Seattle"));
+        updatedFlightEntityForValidation.setOriginAirport(new Airport("LAX", "Los Angeles"));
+        updatedFlightEntityForValidation.setDestinationAirport(new Airport("SEA", "Seattle"));
 
         String username = userEntity.getUsername();
         when(securityContext.getAuthentication()).thenReturn(authentication);

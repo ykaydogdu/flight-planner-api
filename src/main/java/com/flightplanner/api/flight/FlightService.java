@@ -39,16 +39,23 @@ public class FlightService {
     }
 
     public List<FlightResponseDTO> getAllFlights(String airlineCode,
-                                                 String srcAirportCode,
-                                                 String destAirportCode,
+                                                 String originAirportCode,
+                                                 String destinationAirportCode,
                                                  LocalDate departureDate) {
         List<Flight> flights = flightRepository.findFilteredFlights(
                 airlineCode,
-                srcAirportCode,
-                destAirportCode,
+                originAirportCode,
+                destinationAirportCode,
                 departureDate != null ? departureDate.atStartOfDay() : null,
                 departureDate != null ? departureDate.atTime(LocalTime.MAX) : null
         );
+        return flights.stream()
+                .map(flightMapper::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<FlightResponseDTO> getAllFlights() {
+        List<Flight> flights = flightRepository.findAll();
         return flights.stream()
                 .map(flightMapper::toResponseDto)
                 .collect(Collectors.toList());
@@ -109,10 +116,10 @@ public class FlightService {
         boolean dateChanged = !existingFlight.getDepartureTime().toLocalDate()
                 .equals(updatedFlight.getDepartureTime().toLocalDate());
         boolean airlineChanged = !existingFlight.getAirline().getCode().equals(updatedFlight.getAirlineCode());
-        boolean sourceChanged = !existingFlight.getSrcAirport().getCode().equals(updatedFlight.getSrcAirportCode());
-        boolean destChanged = !existingFlight.getDestAirport().getCode().equals(updatedFlight.getDestAirportCode());
+        boolean originChanged = !existingFlight.getOriginAirport().getCode().equals(updatedFlight.getOriginAirportCode());
+        boolean destinationChanged = !existingFlight.getDestinationAirport().getCode().equals(updatedFlight.getDestinationAirportCode());
 
-        return dateChanged || airlineChanged || sourceChanged || destChanged;
+        return dateChanged || airlineChanged || originChanged || destinationChanged;
     }
 
     /**
@@ -131,8 +138,8 @@ public class FlightService {
         // Check flight number
         long existingFlightsCount = flightRepository.dailyFlightCount(
                 flight.getAirline().getCode(),
-                flight.getSrcAirport().getCode(),
-                flight.getDestAirport().getCode(),
+                flight.getOriginAirport().getCode(),
+                flight.getDestinationAirport().getCode(),
                 startOfDay,
                 endOfDay
         );
@@ -142,8 +149,8 @@ public class FlightService {
             throw new FlightLimitExceededException(
                     MAX_DAILY_FLIGHTS,
                     flight.getAirline().getCode(),
-                    flight.getSrcAirport().getCode(),
-                    flight.getDestAirport().getCode()
+                    flight.getOriginAirport().getCode(),
+                    flight.getDestinationAirport().getCode()
             );
         }
     }

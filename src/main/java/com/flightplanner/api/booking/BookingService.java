@@ -68,8 +68,8 @@ public class BookingService {
                 .price(flight.getPrice())
                 .numberOfSeats(booking.getNumberOfSeats())
                 .airlineCode(flight.getAirline().getCode())
-                .srcAirportCode(flight.getSrcAirport().getCode())
-                .destAirportCode(flight.getDestAirport().getCode())
+                .originAirportCode(flight.getOriginAirport().getCode())
+                .destinationAirportCode(flight.getDestinationAirport().getCode())
                 .departureTime(flight.getDepartureTime())
                 .build();
     }
