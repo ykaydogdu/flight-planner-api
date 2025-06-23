@@ -1,5 +1,8 @@
 package com.flightplanner.api.flight.dto;
 
+import com.flightplanner.api.airline.Airline;
+import com.flightplanner.api.airport.Airport;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +19,7 @@ public class FlightResponseDTO {
     private double price;
     private int emptySeats;
     private LocalDateTime departureTime;
-    private String airlineCode;
-    private String originAirportCode;
-    private String destinationAirportCode;
+    private Airline airline;
+    private Airport originAirport;
+    private Airport destinationAirport;
 }

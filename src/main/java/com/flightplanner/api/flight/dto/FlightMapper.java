@@ -31,9 +31,9 @@ public class FlightMapper {
         FlightResponseDTO dto = new FlightResponseDTO();
         dto.setId(flight.getId());
         dto.setDepartureTime(flight.getDepartureTime());
-        dto.setAirlineCode(flight.getAirline().getCode());
-        dto.setOriginAirportCode(flight.getOriginAirport().getCode());
-        dto.setDestinationAirportCode(flight.getDestinationAirport().getCode());
+        dto.setAirline(flight.getAirline());
+        dto.setOriginAirport(flight.getOriginAirport());
+        dto.setDestinationAirport(flight.getDestinationAirport());
         return dto;
     }
 
