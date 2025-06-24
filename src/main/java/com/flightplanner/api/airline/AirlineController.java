@@ -4,7 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.flightplanner.api.airline.dto.AirlineWithStaffCountDTO;
 
 import java.util.List;
 
@@ -25,8 +29,8 @@ public class AirlineController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of airlines"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access"),
     })
-    public List<Airline> getAllAirlines() {
-        return airlineService.getAllAirlines();
+    public ResponseEntity<List<AirlineWithStaffCountDTO>> getAllAirlines() {
+        return ResponseEntity.ok(airlineService.getAllAirlines());
     }
 
     @PostMapping("")
@@ -36,8 +40,8 @@ public class AirlineController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access"),
     })
-    public Airline addAirline(@RequestBody Airline airline) {
-        return airlineService.addAirline(airline);
+    public ResponseEntity<AirlineWithStaffCountDTO> addAirline(@RequestBody Airline airline) {
+        return new ResponseEntity<>(airlineService.addAirline(airline), HttpStatus.CREATED);
     }
 
     @GetMapping("/{code}")
@@ -47,8 +51,8 @@ public class AirlineController {
             @ApiResponse(responseCode = "404", description = "Airline not found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access"),
     })
-    public Airline getAirlineByCode(@PathVariable String code) {
-        return airlineService.getAirlineByCode(code);
+    public ResponseEntity<AirlineWithStaffCountDTO> getAirlineByCode(@PathVariable String code) {
+        return ResponseEntity.ok(airlineService.getAirlineByCode(code));
     }
 
     @DeleteMapping("/{code}")
@@ -58,7 +62,8 @@ public class AirlineController {
             @ApiResponse(responseCode = "404", description = "Airline not found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access"),
     })
-    public void deleteAirline(@PathVariable String code) {
+    public ResponseEntity<Void> deleteAirline(@PathVariable String code) {
         airlineService.deleteAirline(code);
+        return ResponseEntity.noContent().build();
     }
 }
