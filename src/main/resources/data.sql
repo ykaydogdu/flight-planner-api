@@ -10,16 +10,16 @@ INSERT INTO AIRLINE (code, name) VALUES ('AFR', 'Air France');
 INSERT INTO AIRLINE (code, name) VALUES ('KLM', 'KLM Royal Dutch');
 
 -- Insert Airports
-INSERT INTO AIRPORT (code, name) VALUES ('IST', 'Istanbul Airport');
-INSERT INTO AIRPORT (code, name) VALUES ('SAW', 'Sabiha Gokcen Airport');
-INSERT INTO AIRPORT (code, name) VALUES ('LHR', 'London Heathrow');
-INSERT INTO AIRPORT (code, name) VALUES ('CDG', 'Charles de Gaulle');
-INSERT INTO AIRPORT (code, name) VALUES ('AMS', 'Amsterdam Schiphol');
-INSERT INTO AIRPORT (code, name) VALUES ('FRA', 'Frankfurt Airport');
-INSERT INTO AIRPORT (code, name) VALUES ('SVO', 'Sheremetyevo Intl');
-INSERT INTO AIRPORT (code, name) VALUES ('JFK', 'John F. Kennedy Intl');
-INSERT INTO AIRPORT (code, name) VALUES ('DUB', 'Dublin Airport');
-INSERT INTO AIRPORT (code, name) VALUES ('LGW', 'London Gatwick');
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('IST', 'Istanbul Airport', 'Istanbul', 'Turkey', 41.2753, 28.7519);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('SAW', 'Sabiha Gokcen Airport', 'Istanbul', 'Turkey', 40.8983, 29.3092);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('LHR', 'London Heathrow', 'London', 'United Kingdom', 51.4700, -0.4543);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('CDG', 'Charles de Gaulle', 'Paris', 'France', 49.0097, 2.5479);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('AMS', 'Amsterdam Schiphol', 'Amsterdam', 'Netherlands', 52.3105, 4.7683);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('FRA', 'Frankfurt Airport', 'Frankfurt', 'Germany', 50.0379, 8.5622);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('SVO', 'Sheremetyevo Intl', 'Moscow', 'Russia', 55.9736, 37.4125);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('JFK', 'John F. Kennedy Intl', 'New York', 'United States', 40.6413, -73.7781);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('DUB', 'Dublin Airport', 'Dublin', 'Ireland', 53.4264, -6.2499);
+INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('LGW', 'London Gatwick', 'London', 'United Kingdom', 51.1537, -0.1821);
 
 -- Insert Users with BCrypt hashed passwords
 INSERT INTO APP_USER (username, password, email, role) VALUES ('user1', '$2y$12$zkiAcfx1qwgxVPxKTbzbl.j7u9wfrUtyfjO/e4u414mZMDmimcrtG', 'user1@example.com', 'ROLE_USER'); -- pass1
