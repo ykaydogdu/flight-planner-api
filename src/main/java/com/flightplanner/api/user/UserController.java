@@ -41,7 +41,7 @@ public class UserController {
         return ResponseEntity.ok("Airline " + airlineCode + " assigned to user " + username);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "Get all users", description = "Retrieves a list of all users in the system.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),

@@ -24,7 +24,7 @@ public class FlightController {
         this.flightService = flightService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "Get all flights", description = "Retrieves a list of all available flights.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of flights"),
@@ -39,7 +39,7 @@ public class FlightController {
         return ResponseEntity.ok(flights);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @Operation(summary = "Create a new flight", description = "Creates a new flight with the provided details. (Only for airline staff)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Flight created successfully"),

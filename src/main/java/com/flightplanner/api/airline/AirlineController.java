@@ -19,7 +19,7 @@ public class AirlineController {
         this.airlineService = airlineService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "Get all airlines", description = "Retrieves a list of all airlines.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of airlines"),
@@ -29,7 +29,7 @@ public class AirlineController {
         return airlineService.getAllAirlines();
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @Operation(summary = "Add a new airline", description = "Creates a new airline with the provided details. (Only admin)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Airline created successfully"),

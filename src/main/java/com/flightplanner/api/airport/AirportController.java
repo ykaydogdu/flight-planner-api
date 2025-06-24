@@ -19,7 +19,7 @@ public class AirportController {
         this.airportService = airportService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "Get all airports", description = "Retrieves a list of all airports.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of airports"),
@@ -29,7 +29,7 @@ public class AirportController {
         return airportService.getAllAirports();
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @Operation(summary = "Create a new airport", description = "Creates a new airport with the provided details. (Only admin)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Airport created successfully"),
