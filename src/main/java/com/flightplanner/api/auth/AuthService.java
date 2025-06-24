@@ -80,10 +80,14 @@ public class AuthService {
             // retrieve user details
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
+            // fetch user entity from repository
+            User user = userRepository.findById(userDetails.getUsername())
+                    .orElseThrow(InvalidCredentialsException::new);
+
             // generate token
             String jwt = jwtService.generateToken(userDetails);
 
-            return new AuthResponseDTO(jwt);
+            return new AuthResponseDTO(jwt, user);
         } catch (RuntimeException ex) {
             throw new InvalidCredentialsException();
         }
