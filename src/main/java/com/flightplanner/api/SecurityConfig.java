@@ -45,7 +45,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests( auth -> auth
-                        .requestMatchers("/api/v1/users/").hasRole("ADMIN") // Only admin can access user list
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow pre-flight requests for CORS
+
+                        .requestMatchers("/api/v1/users").hasRole("ADMIN") // Only admin can access user operations
                         .requestMatchers(HttpMethod.GET).permitAll()
 
                         // Allow unauthenticated access for these paths
@@ -57,9 +59,6 @@ public class SecurityConfig {
                         // Specific roles for specific HTTP methods and paths
                         .requestMatchers(HttpMethod.POST, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/flights/**").hasRole("AIRLINE_STAFF")
-
-                        // User patching endpoints
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("ADMIN")
 
                         // Fix errors
                         .requestMatchers("/error").permitAll()

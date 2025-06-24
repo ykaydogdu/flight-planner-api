@@ -6,6 +6,7 @@ import com.flightplanner.api.airline.AirlineRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -52,7 +53,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Iterable<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
