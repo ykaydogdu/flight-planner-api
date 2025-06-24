@@ -1,0 +1,3 @@
+[submodule "flight-planner-frontend"]
+	path = flight-planner-frontend
+	url = https://github.com/ykaydogdu/flight-planner-frontend.git
