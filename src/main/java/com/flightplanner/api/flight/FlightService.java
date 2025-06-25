@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FlightService {
@@ -42,29 +41,27 @@ public class FlightService {
                                                  String originAirportCode,
                                                  String destinationAirportCode,
                                                  LocalDate departureDate) {
-        List<Flight> flights = flightRepository.findFilteredFlights(
+        List<FlightResponseDTO> flights = flightRepository.findFilteredFlights(
                 airlineCode,
                 originAirportCode,
                 destinationAirportCode,
                 departureDate != null ? departureDate.atStartOfDay() : null,
                 departureDate != null ? departureDate.atTime(LocalTime.MAX) : null
         );
-        return flights.stream()
-                .map(flightMapper::toResponseDto)
-                .collect(Collectors.toList());
+        return flights;
     }
 
     public List<FlightResponseDTO> getAllFlights() {
-        List<Flight> flights = flightRepository.findAll();
-        return flights.stream()
-                .map(flightMapper::toResponseDto)
-                .collect(Collectors.toList());
+        List<FlightResponseDTO> flights = flightRepository.findAllWithEmptySeats();
+        flights.forEach(flightMapper::fixTimeZone);
+        return flights;
     }
 
     public FlightResponseDTO getFlightById(final Long id) {
-        return flightMapper.toResponseDto(
-                flightRepository.findById(id)
-                        .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}})));
+        FlightResponseDTO flight = flightRepository.findByIdWithEmptySeats(id)
+                .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}}));
+        flightMapper.fixTimeZone(flight);
+        return flight;
     }
 
     @Transactional
@@ -73,7 +70,9 @@ public class FlightService {
         validateFlightLimit(flight);
         validateAirlineStaffAuthorization(flight.getAirlineCode());
         Flight createdFlight = flightRepository.save(flight);
-        return flightMapper.toResponseDto(createdFlight);
+        FlightResponseDTO createdFlightResponse = getFlightById(createdFlight.getId());
+        flightMapper.fixTimeZone(createdFlightResponse);
+        return createdFlightResponse;
     }
 
     @Transactional
@@ -81,11 +80,12 @@ public class FlightService {
         Flight existingFlight = flightRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}}));
 
-        Flight updatedFlight = flightMapper.toEntity(requestDTO);
         // Validate that the user is authorized to update this flight
         validateAirlineStaffAuthorization(existingFlight.getAirlineCode());
+
         if (hasFlightAttrChanged(existingFlight, requestDTO)) {
-            validateFlightLimit(updatedFlight);
+            Flight flightFromRequest = flightMapper.toEntity(requestDTO);
+            validateFlightLimit(flightFromRequest);
         }
 
         // If airline is changed, reject
@@ -93,9 +93,12 @@ public class FlightService {
             throw new UnauthorizedActionException("You cannot change airline of a flight.");
         }
 
-        updatedFlight.setId(id);
+        Flight updatedFlight = flightMapper.updateEntity(existingFlight, requestDTO);
+
         Flight savedFlight = flightRepository.save(updatedFlight);
-        return flightMapper.toResponseDto(savedFlight);
+        FlightResponseDTO updatedFlightResponse = getFlightById(savedFlight.getId());
+        flightMapper.fixTimeZone(updatedFlightResponse);
+        return updatedFlightResponse;
     }
 
     @Transactional
@@ -115,7 +118,7 @@ public class FlightService {
     private boolean hasFlightAttrChanged(final Flight existingFlight, final FlightRequestDTO updatedFlight) {
         boolean dateChanged = !existingFlight.getDepartureTime().toLocalDate()
                 .equals(updatedFlight.getDepartureTime().toLocalDate());
-        boolean airlineChanged = !existingFlight.getAirline().getCode().equals(updatedFlight.getAirlineCode());
+        boolean airlineChanged = !existingFlight.getAirlineCode().equals(updatedFlight.getAirlineCode());
         boolean originChanged = !existingFlight.getOriginAirport().getCode().equals(updatedFlight.getOriginAirportCode());
         boolean destinationChanged = !existingFlight.getDestinationAirport().getCode().equals(updatedFlight.getDestinationAirportCode());
 
@@ -137,7 +140,7 @@ public class FlightService {
 
         // Check flight number
         long existingFlightsCount = flightRepository.dailyFlightCount(
-                flight.getAirline().getCode(),
+                flight.getAirlineCode(),
                 flight.getOriginAirport().getCode(),
                 flight.getDestinationAirport().getCode(),
                 startOfDay,
@@ -148,7 +151,7 @@ public class FlightService {
         if (existingFlightsCount >= MAX_DAILY_FLIGHTS) {
             throw new FlightLimitExceededException(
                     MAX_DAILY_FLIGHTS,
-                    flight.getAirline().getCode(),
+                    flight.getAirlineCode(),
                     flight.getOriginAirport().getCode(),
                     flight.getDestinationAirport().getCode()
             );

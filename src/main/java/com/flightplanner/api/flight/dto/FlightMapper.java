@@ -5,42 +5,38 @@ import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airline.AirlineRepository;
 import com.flightplanner.api.airport.Airport;
 import com.flightplanner.api.airport.AirportRepository;
+import com.flightplanner.api.airport.AirportService;
 import com.flightplanner.api.flight.Flight;
-import org.springframework.stereotype.Component;
+import com.flightplanner.api.timezone.TimezoneService;
 
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.TimeZone;
 
-@Component
+@Service
 public class FlightMapper {
 
     private final AirlineRepository airlineRepository;
     private final AirportRepository airportRepository;
+    private final AirportService airportService;
+    private final TimezoneService timeZoneService;
 
-    public FlightMapper(AirlineRepository airlineRepository, AirportRepository airportRepository) {
+    public FlightMapper(AirlineRepository airlineRepository,
+                        AirportRepository airportRepository,
+                        AirportService airportService,
+                        TimezoneService timeZoneService) {
         this.airlineRepository = airlineRepository;
         this.airportRepository = airportRepository;
-    }
-
-    /**
-     * Converts a Flight entity to a FlightResponseDTO
-     */
-    public FlightResponseDTO toResponseDto(Flight flight) {
-        if (flight == null) {
-            return null;
-        }
-        FlightResponseDTO dto = new FlightResponseDTO();
-        dto.setId(flight.getId());
-        dto.setDepartureTime(flight.getDepartureTime());
-        dto.setAirline(flight.getAirline());
-        dto.setOriginAirport(flight.getOriginAirport());
-        dto.setDestinationAirport(flight.getDestinationAirport());
-        return dto;
+        this.airportService = airportService;
+        this.timeZoneService = timeZoneService;
     }
 
     /**
      * Converts a FlightRequestDTO to a Flight entity.
      */
-    public Flight toEntity(FlightRequestDTO dto) {
+    public Flight toEntity(final FlightRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -58,14 +54,43 @@ public class FlightMapper {
                     put("code", dto.getDestinationAirportCode());
                 }}));
 
+        // Calculate departure time
+        LocalDateTime departureTime = dto.getDepartureTime();
+        TimeZone originTimezone = timeZoneService.getTimezone(originAirport.getLatitude(), originAirport.getLongitude());
+        departureTime = timeZoneService.convertLocalDateTimeToUtc(departureTime, originTimezone);
+
+        // Calculate arrival time
+        LocalDateTime arrivalTime = departureTime.plusMinutes(dto.getDuration());
+        TimeZone destinationTimezone = timeZoneService.getTimezone(destinationAirport.getLatitude(), destinationAirport.getLongitude());
+        arrivalTime = timeZoneService.convertLocalDateTimeToUtc(arrivalTime, destinationTimezone);
+
         return new Flight(
-                dto.getDepartureTime(),
+                departureTime,
+                dto.getDuration(),
+                arrivalTime,
                 dto.getPrice(),
                 dto.getSeatCount(),
                 airline,
                 originAirport,
                 destinationAirport
         );
+    }
+
+    public void fixTimeZone(FlightResponseDTO dto) {
+        TimeZone originTimezone = timeZoneService.getTimezone(dto.getOriginAirport().getLatitude(), dto.getOriginAirport().getLongitude());
+        dto.setDepartureTime(timeZoneService.convertUtcToLocalDateTime(dto.getDepartureTime(), originTimezone));
+        TimeZone destinationTimezone = timeZoneService.getTimezone(dto.getDestinationAirport().getLatitude(), dto.getDestinationAirport().getLongitude());
+        dto.setArrivalTime(timeZoneService.convertUtcToLocalDateTime(dto.getArrivalTime(), destinationTimezone));
+    }
+
+    public Flight updateEntity(Flight flight, FlightRequestDTO requestDTO) {
+        flight.setOriginAirport(airportService.getAirportByCode(requestDTO.getOriginAirportCode()));
+        flight.setDestinationAirport(airportService.getAirportByCode(requestDTO.getDestinationAirportCode()));
+        flight.setDepartureTime(requestDTO.getDepartureTime());
+        flight.setPrice(requestDTO.getPrice());
+        flight.setSeatCount(requestDTO.getSeatCount());
+        flight.setDuration(requestDTO.getDuration());
+        return flight;
     }
 
 }

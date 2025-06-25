@@ -20,11 +20,17 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "price", nullable = false)
+    private double price;
+
     @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
 
-    @Column(name = "price", nullable = false)
-    private double price;
+    @Column(name = "arrival_time", nullable = false)
+    private LocalDateTime arrivalTime;
+
+    @Column(name = "duration", nullable = false)
+    private int duration;
 
     @Column(name = "seat_count", nullable = false)
     private int seatCount;
@@ -42,6 +48,8 @@ public class Flight {
     private Airport destinationAirport;
 
     public Flight(final LocalDateTime departureTime,
+                  final int duration,
+                  final LocalDateTime arrivalTime,
                   final double price,
                   final int seatCount,
                   final Airline airline,
@@ -52,9 +60,10 @@ public class Flight {
         }
 
         this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
         this.price = price;
         this.seatCount = seatCount;
-
+        this.duration = duration;
         this.airline = airline;
         this.originAirport = originAirport;
         this.destinationAirport = destinationAirport;
