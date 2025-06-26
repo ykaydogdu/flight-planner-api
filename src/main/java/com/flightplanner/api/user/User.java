@@ -30,6 +30,12 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(name = "email")
     private String email;
 
@@ -49,7 +55,7 @@ public class User implements UserDetails {
         this.role = Role.ROLE_USER;
     }
 
-    public User(String username, String hashedPassword, String email, Role role, Airline airline) {
+    public User(String username, String hashedPassword, String firstName, String lastName, String email) {
         // Email format check
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -62,8 +68,7 @@ public class User implements UserDetails {
         this.username = username;
         this.password = hashedPassword;
         this.email = email;
-        this.role = role;
-        this.airline = airline;
+        this.role = Role.ROLE_USER;
     }
 
     // UserDetails methods

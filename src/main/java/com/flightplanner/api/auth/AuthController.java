@@ -2,6 +2,7 @@ package com.flightplanner.api.auth;
 
 import com.flightplanner.api.auth.dto.AuthResponseDTO;
 import com.flightplanner.api.auth.dto.AuthRequestDTO;
+import com.flightplanner.api.auth.dto.RegisterRequestDTO;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,8 +36,8 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "409", description = "Username already exists")
     })
-    public ResponseEntity<String> registerUser(@RequestBody AuthRequestDTO registerRequest) {
-        User user = authService.registerUser(registerRequest.getUsername(), registerRequest.getPassword());
+    public ResponseEntity<String> registerUser(@RequestBody RegisterRequestDTO registerRequest) {
+        User user = authService.registerUser(registerRequest);
         return new ResponseEntity<>(user.getUsername(), HttpStatus.CREATED);
     }
 

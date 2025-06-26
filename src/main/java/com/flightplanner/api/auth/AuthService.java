@@ -1,6 +1,7 @@
 package com.flightplanner.api.auth;
 
 import com.flightplanner.api.auth.dto.AuthResponseDTO;
+import com.flightplanner.api.auth.dto.RegisterRequestDTO;
 import com.flightplanner.api.auth.jwt.JwtService;
 import com.flightplanner.api.user.Role;
 import com.flightplanner.api.user.User;
@@ -42,7 +43,9 @@ public class AuthService {
      * @param password The plain password
      * @return The created user entity
      */
-    public User registerUser(final String username, final String password) {
+    public User registerUser(final RegisterRequestDTO registerRequest) {
+        String username = registerRequest.getUsername();
+        String password = registerRequest.getPassword();
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
@@ -55,7 +58,7 @@ public class AuthService {
         }
 
         String encodedPassword = bCryptPasswordEncoder.encode(password);
-        User user = new User(username, encodedPassword);
+        User user = new User(username, encodedPassword, registerRequest.getFirstName(), registerRequest.getLastName(), registerRequest.getEmail());
         user.setRole(Role.ROLE_USER);
         return userRepository.save(user);
     }
