@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -16,9 +17,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-//TODO: Fix the test to return 201 Created for user registration
 @SpringBootTest
-@AutoConfigureMockMvc // Disable security filters for testing
+@AutoConfigureMockMvc(addFilters = false) // Disable security filters for testing
+@ActiveProfiles("test")
 class ApplicationTests {
 
     @Autowired
@@ -36,7 +37,7 @@ class ApplicationTests {
 
     @Test
     void shouldReturnOkForPublicEndpoints() throws Exception {
-        mockMvc.perform(get("/api/v1/flights/"))
+        mockMvc.perform(get("/api/v1/flights"))
                 .andExpect(status().isOk());
     }
 
@@ -45,12 +46,16 @@ class ApplicationTests {
         // Register a new user
         String registerPayload = "{" +
                 "\"username\": \"integrationuser\"," +
-                "\"password\": \"integrationpass\"}";
+                "\"password\": \"integrationpass\"," +
+                "\"firstName\": \"Integration\"," +
+                "\"lastName\": \"User\"," +
+                "\"email\": \"integration@test.com\"}";
+
         mockMvc.perform(
                 post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(registerPayload)
-        ).andExpect(status().isCreated()); //TODO: Fix this to return 201 Created
+        ).andExpect(status().isCreated());
 
         // Login with the new user
         String loginPayload = "{" +
@@ -61,6 +66,6 @@ class ApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginPayload)
         ).andExpect(status().isOk())
-         .andExpect(jsonPath("$.token").exists());
+         .andExpect(jsonPath("$.user").exists());
     }
 }

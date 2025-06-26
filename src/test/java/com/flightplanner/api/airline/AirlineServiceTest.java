@@ -1,6 +1,7 @@
 package com.flightplanner.api.airline;
 
 import com.flightplanner.api.NotFoundException;
+import com.flightplanner.api.airline.dto.AirlineWithStaffCountDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,7 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,59 +30,68 @@ class AirlineServiceTest {
 
     @Test
     void testGetAllAirlines() {
-        List<Airline> airlines = Arrays.asList(new Airline("AA", "American Airlines"),
-                                               new Airline("DL", "Delta Airlines"));
+        List<AirlineWithStaffCountDTO> airlines = Arrays.asList(
+            new AirlineWithStaffCountDTO("AA", "American Airlines", 100),
+            new AirlineWithStaffCountDTO("DL", "Delta Airlines", 200)
+        );
 
-        when(airlineRepository.findAll()).thenReturn(airlines);
+        when(airlineRepository.findAllAirlinesWithStaffCount()).thenReturn(airlines);
 
-        List<Airline> result = airlineService.getAllAirlines();
+        List<AirlineWithStaffCountDTO> result = airlineService.getAllAirlines();
 
         assertEquals(2, result.size());
-        assertEquals("AA", result.get(0).getCode());
-        assertEquals("American Airlines", result.get(0).getName());
+        assertEquals("AA", Objects.requireNonNull(result.stream().findFirst().orElse(null)).getCode());
+        assertEquals("American Airlines", Objects.requireNonNull(result.stream().findFirst().orElse(null)).getName());
+        assertEquals(100, Objects.requireNonNull(result.stream().findFirst().orElse(null)).getStaffCount());
         assertEquals("DL", result.get(1).getCode());
         assertEquals("Delta Airlines", result.get(1).getName());
+        assertEquals(200, result.get(1).getStaffCount());
 
-        verify(airlineRepository).findAll();
+        verify(airlineRepository).findAllAirlinesWithStaffCount();
     }
 
     @Test
     void testGetAirlineByCodeSuccess() {
-        Airline airline = new Airline("AA", "American Airlines");
+        AirlineWithStaffCountDTO airline = new AirlineWithStaffCountDTO("AA", "American Airlines", 100);
 
-        when(airlineRepository.findById("AA")).thenReturn(Optional.of(airline));
+        when(airlineRepository.findAllAirlinesWithStaffCount()).thenReturn(List.of(airline));
 
-        Airline result = airlineService.getAirlineByCode("AA");
+        AirlineWithStaffCountDTO result = airlineService.getAirlineByCode("AA");
 
         assertNotNull(result);
         assertEquals("AA", result.getCode());
         assertEquals("American Airlines", result.getName());
+        assertEquals(100, result.getStaffCount());
 
-        verify(airlineRepository).findById("AA");
+        verify(airlineRepository).findAllAirlinesWithStaffCount();
     }
 
     @Test
     void testGetAirlineByCodeThrowsException() {
-        when(airlineRepository.findById("AA")).thenReturn(Optional.empty());
+        when(airlineRepository.findAllAirlinesWithStaffCount()).thenReturn(List.of());
 
         assertThrows(NotFoundException.class, () -> airlineService.getAirlineByCode("AA"));
 
-        verify(airlineRepository).findById("AA");
+        verify(airlineRepository).findAllAirlinesWithStaffCount();
     }
 
     @Test
     void testAddAirline() {
         Airline airline = new Airline("AA", "American Airlines");
+        AirlineWithStaffCountDTO savedAirline = new AirlineWithStaffCountDTO("AA", "American Airlines", 100);
 
         when(airlineRepository.save(airline)).thenReturn(airline);
+        when(airlineRepository.findAllAirlinesWithStaffCount()).thenReturn(List.of(savedAirline));
 
-        Airline result = airlineService.addAirline(airline);
+        AirlineWithStaffCountDTO result = airlineService.addAirline(airline);
 
         assertNotNull(result);
         assertEquals("AA", result.getCode());
         assertEquals("American Airlines", result.getName());
+        assertEquals(100, result.getStaffCount());
 
         verify(airlineRepository).save(airline);
+        verify(airlineRepository).findAllAirlinesWithStaffCount();
     }
 
     @Test

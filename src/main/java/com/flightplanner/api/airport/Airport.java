@@ -32,4 +32,8 @@ public class Airport {
     @Column(name = "longitude")
     private Double longitude;
 
+    public Airport(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 }

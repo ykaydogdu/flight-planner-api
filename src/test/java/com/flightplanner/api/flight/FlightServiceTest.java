@@ -67,28 +67,66 @@ class FlightServiceTest {
         testDepartureTime = LocalDateTime.now().plusDays(10);
 
         // Entities with necessary fields for validation/mapping
-        airlineEntity = new Airline("THY", "Turkish Airlines");
-        String username = "testUser";
-        userEntity = new User(username, "password", "test@test.com", Role.ROLE_AIRLINE_STAFF, airlineEntity);
+        airlineEntity = new Airline();
+        airlineEntity.setCode("THY");
+        airlineEntity.setName("Turkish Airlines");
 
-        srcAirportEntity = new Airport("IST", "Istanbul Airport");
-        destAirportEntity = new Airport("CDG", "Charles de Gaulle Airport");
+        String username = "testUser";
+        userEntity = new User();
+        userEntity.setUsername(username);
+        userEntity.setPassword("password");
+        userEntity.setEmail("test@test.com");
+        userEntity.setRole(Role.ROLE_AIRLINE_STAFF);
+        userEntity.setAirline(airlineEntity);
+
+        srcAirportEntity = new Airport();
+        srcAirportEntity.setCode("IST");
+        srcAirportEntity.setName("Istanbul Airport");
+
+        destAirportEntity = new Airport();
+        destAirportEntity.setCode("CDG");
+        destAirportEntity.setName("Charles de Gaulle Airport");
 
         // Flight entity as it would be if returned from repository or created
-        flightEntity = new Flight(1L, testDepartureTime, 100, 100, airlineEntity, srcAirportEntity, destAirportEntity);
+        flightEntity = new Flight();
+        flightEntity.setId(1L);
+        flightEntity.setPrice(150.0);
+        flightEntity.setDepartureTime(testDepartureTime);
+        flightEntity.setArrivalTime(testDepartureTime.plusHours(2));
+        flightEntity.setDuration(120);
+        flightEntity.setSeatCount(100);
+        flightEntity.setAirline(airlineEntity);
+        flightEntity.setOriginAirport(srcAirportEntity);
+        flightEntity.setDestinationAirport(destAirportEntity);
 
         // DTOs for request and response
-        flightRequestDTO = new FlightRequestDTO(testDepartureTime, 100, 100, "THY", "IST", "CDG");
-        flightResponseDTO = new FlightResponseDTO(1L, 100, 100, testDepartureTime, "THY", "IST", "CDG");
+        flightRequestDTO = new FlightRequestDTO();
+        flightRequestDTO.setDepartureTime(testDepartureTime);
+        flightRequestDTO.setDuration(120);
+        flightRequestDTO.setPrice(150.0);
+        flightRequestDTO.setSeatCount(100);
+        flightRequestDTO.setAirlineCode("THY");
+        flightRequestDTO.setOriginAirportCode("IST");
+        flightRequestDTO.setDestinationAirportCode("CDG");
+
+        flightResponseDTO = new FlightResponseDTO();
+        flightResponseDTO.setId(1L);
+        flightResponseDTO.setPrice(150.0);
+        flightResponseDTO.setSeatCount(100);
+        flightResponseDTO.setEmptySeats(100);
+        flightResponseDTO.setDepartureTime(testDepartureTime);
+        flightResponseDTO.setArrivalTime(testDepartureTime.plusHours(2));
+        flightResponseDTO.setDuration(120);
+        flightResponseDTO.setAirline(airlineEntity);
+        flightResponseDTO.setOriginAirport(srcAirportEntity);
+        flightResponseDTO.setDestinationAirport(destAirportEntity);
     }
 
     @Test
     void getAllFlights_shouldReturnListOfFlightResponseDTOs() {
         // Arrange
-        List<Flight> flights = Arrays.asList(flightEntity, new Flight()); // Mock 2 entities
-        when(flightRepository.findAll()).thenReturn(flights); // Repository returns entities
-        when(flightMapper.toResponseDto(any(Flight.class))) // Mapper converts each entity
-                .thenReturn(flightResponseDTO); // For simplicity, returning the same DTO for both
+        List<FlightResponseDTO> flights = Arrays.asList(flightResponseDTO, new FlightResponseDTO()); // Mock 2 entities
+        when(flightRepository.findAllWithEmptySeats()).thenReturn(flights); // Repository returns entities
 
         // Act
         List<FlightResponseDTO> result = flightService.getAllFlights();
@@ -97,16 +135,15 @@ class FlightServiceTest {
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(flightResponseDTO, result.getFirst()); // Assuming equals/hashCode for DTO
-        verify(flightRepository, times(1)).findAll();
-        verify(flightMapper, times(2)).toResponseDto(any(Flight.class)); // Called twice for 2 entities
+        verify(flightRepository, times(1)).findAllWithEmptySeats();
+        verify(flightMapper, times(2)).fixTimeZone(any(FlightResponseDTO.class)); // Called twice for 2 entities
     }
 
     @Test
     void getFlightById_shouldReturnFlightResponseDTO_whenFound() {
         // Arrange
         Long flightId = 1L;
-        when(flightRepository.findById(flightId)).thenReturn(Optional.of(flightEntity));
-        when(flightMapper.toResponseDto(any(Flight.class))).thenReturn(flightResponseDTO);
+        when(flightRepository.findByIdWithEmptySeats(flightId)).thenReturn(Optional.of(flightResponseDTO));
 
         // Act
         FlightResponseDTO result = flightService.getFlightById(flightId);
@@ -114,20 +151,20 @@ class FlightServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(flightResponseDTO, result);
-        verify(flightRepository, times(1)).findById(flightId);
-        verify(flightMapper, times(1)).toResponseDto(flightEntity);
+        verify(flightRepository, times(1)).findByIdWithEmptySeats(flightId);
+        verify(flightMapper, times(1)).fixTimeZone(flightResponseDTO);
     }
 
     @Test
     void getFlightById_shouldThrowNotFoundException_whenNotFound() {
         // Arrange
         Long nonExistentId = 99L;
-        when(flightRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+        when(flightRepository.findByIdWithEmptySeats(nonExistentId)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NotFoundException.class, () -> flightService.getFlightById(nonExistentId));
-        verify(flightRepository, times(1)).findById(nonExistentId);
-        verify(flightMapper, never()).toResponseDto(any(Flight.class)); // Mapper should not be called
+        verify(flightRepository, times(1)).findByIdWithEmptySeats(nonExistentId);
+        verify(flightMapper, never()).fixTimeZone(any(FlightResponseDTO.class)); // Mapper should not be called
     }
 
     @Test
@@ -139,7 +176,7 @@ class FlightServiceTest {
         )).thenReturn(1L); // Current flights: 1 (less than 3)
         when(flightRepository.save(any(Flight.class))).thenReturn(flightEntity); // Repository saves and returns the entity
         when(flightMapper.toEntity(any(FlightRequestDTO.class))).thenReturn(flightEntity);
-        when(flightMapper.toResponseDto(any(Flight.class))).thenReturn(flightResponseDTO);
+        when(flightRepository.findByIdWithEmptySeats(any(Long.class))).thenReturn(Optional.of(flightResponseDTO));
 
         // Act
         String username = userEntity.getUsername();
@@ -156,14 +193,14 @@ class FlightServiceTest {
         assertEquals(flightResponseDTO, result);
         verify(flightMapper, times(1)).toEntity(flightRequestDTO); // Mapper converts request DTO to entity
         verify(flightRepository, times(1)).dailyFlightCount(
-                eq(flightEntity.getAirline().getCode()),
+                eq(flightEntity.getAirlineCode()),
                 eq(flightEntity.getOriginAirport().getCode()),
                 eq(flightEntity.getDestinationAirport().getCode()),
                 any(LocalDateTime.class),
                 any(LocalDateTime.class)
         ); // Validate limit check is done
         verify(flightRepository, times(1)).save(flightEntity); // Flight is saved
-        verify(flightMapper, times(1)).toResponseDto(flightEntity); // Saved entity converted to response DTO
+        verify(flightMapper, times(2)).fixTimeZone(flightResponseDTO); // Saved entity converted to response DTO
     }
 
     @Test
@@ -180,7 +217,7 @@ class FlightServiceTest {
         // Verify no save operation occurred
         verify(flightRepository, never()).save(any(Flight.class));
         verify(flightMapper, times(1)).toEntity(flightRequestDTO); // Mapper is called before validation
-        verify(flightMapper, never()).toResponseDto(any(Flight.class)); // No response DTO conversion
+        verify(flightMapper, never()).fixTimeZone(any(FlightResponseDTO.class)); // No response DTO conversion
     }
 
     @Test
@@ -188,16 +225,39 @@ class FlightServiceTest {
         // Arrange
         Long flightId = 1L;
         LocalDateTime newDepartureTime = testDepartureTime.plusDays(1); // Date changed
-        FlightRequestDTO updatedRequestDTO = new FlightRequestDTO(newDepartureTime, 100, 100, "THY", "IST", "CDG");
-        Flight updatedFlightEntity = new Flight(
-                flightId,
-                newDepartureTime,
-                100, 100,
-                airlineEntity,
-                srcAirportEntity,
-                destAirportEntity);
+        FlightRequestDTO updatedRequestDTO = new FlightRequestDTO();
+        updatedRequestDTO.setDepartureTime(newDepartureTime);
+        updatedRequestDTO.setDuration(120);
+        updatedRequestDTO.setPrice(150.0);
+        updatedRequestDTO.setSeatCount(100);
+        updatedRequestDTO.setAirlineCode("THY");
+        updatedRequestDTO.setOriginAirportCode("IST");
+        updatedRequestDTO.setDestinationAirportCode("CDG");
 
-        FlightResponseDTO updatedResponseDTO = new FlightResponseDTO(flightId, 100, 100, newDepartureTime, "THY", "IST", "CDG");
+        Flight updatedFlightEntity = new Flight();
+        updatedFlightEntity.setId(flightId);
+        updatedFlightEntity.setDepartureTime(newDepartureTime);
+        updatedFlightEntity.setArrivalTime(newDepartureTime.plusHours(2));
+        updatedFlightEntity.setDuration(120);
+        updatedFlightEntity.setPrice(150.0);
+        updatedFlightEntity.setSeatCount(100);
+        updatedFlightEntity.setAirline(airlineEntity);
+        updatedFlightEntity.setOriginAirport(srcAirportEntity);
+        updatedFlightEntity.setDestinationAirport(destAirportEntity);
+
+
+        FlightResponseDTO updatedResponseDTO = new FlightResponseDTO();
+        updatedResponseDTO.setId(flightId);
+        updatedResponseDTO.setPrice(150.0);
+        updatedResponseDTO.setSeatCount(100);
+        updatedResponseDTO.setEmptySeats(100);
+        updatedResponseDTO.setDepartureTime(newDepartureTime);
+        updatedResponseDTO.setArrivalTime(newDepartureTime.plusHours(2));
+        updatedResponseDTO.setDuration(120);
+        updatedResponseDTO.setAirline(airlineEntity);
+        updatedResponseDTO.setOriginAirport(srcAirportEntity);
+        updatedResponseDTO.setDestinationAirport(destAirportEntity);
+
 
         // Mock existing flight from repository
         when(flightRepository.findById(flightId)).thenReturn(Optional.of(flightEntity));
@@ -209,7 +269,7 @@ class FlightServiceTest {
 
         // Mock mapper behavior for update
         when(flightMapper.toEntity(updatedRequestDTO)).thenReturn(updatedFlightEntity); // for hasFlightAttrChanged/validateFlightLimit
-        when(flightMapper.toResponseDto(any(Flight.class))).thenReturn(updatedResponseDTO);
+        when(flightRepository.findByIdWithEmptySeats(flightId)).thenReturn(Optional.of(updatedResponseDTO));
 
         // mock auth
         String username = userEntity.getUsername();
@@ -220,6 +280,7 @@ class FlightServiceTest {
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
 
+        when(flightMapper.updateEntity(flightEntity, updatedRequestDTO)).thenReturn(updatedFlightEntity);
         when(flightRepository.save(updatedFlightEntity)).thenReturn(updatedFlightEntity);
 
         // Act
@@ -234,7 +295,7 @@ class FlightServiceTest {
         verify(flightRepository, times(1)).dailyFlightCount(
                 eq("THY"), eq("IST"), eq("CDG"), any(LocalDateTime.class), any(LocalDateTime.class)
         ); // Validation check is performed
-        verify(flightMapper, times(1)).toResponseDto(updatedFlightEntity); // And converted
+        verify(flightMapper, times(2)).fixTimeZone(updatedResponseDTO); // And converted
     }
 
     @Test
@@ -242,11 +303,10 @@ class FlightServiceTest {
         // Arrange
         Long flightId = 1L;
         // Request DTO with same attributes as existing flight, so hasFlightAttrChanged returns false
-        FlightRequestDTO unchangedRequestDTO = new FlightRequestDTO(testDepartureTime, 100, 100, "THY", "IST", "CDG");
+        flightRequestDTO.setDepartureTime(flightEntity.getDepartureTime());
 
         when(flightRepository.findById(flightId)).thenReturn(Optional.of(flightEntity));
-        when(flightMapper.toEntity(unchangedRequestDTO)).thenReturn(flightEntity);
-        when(flightMapper.toResponseDto(any(Flight.class))).thenReturn(flightResponseDTO);
+        when(flightRepository.findByIdWithEmptySeats(flightId)).thenReturn(Optional.of(flightResponseDTO));
 
         String username = userEntity.getUsername();
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -256,21 +316,22 @@ class FlightServiceTest {
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
 
+        when(flightMapper.updateEntity(flightEntity, flightRequestDTO)).thenReturn(flightEntity);
         when(flightRepository.save(flightEntity)).thenReturn(flightEntity);
 
         // Act
-        FlightResponseDTO result = flightService.updateFlight(flightId, unchangedRequestDTO);
+        FlightResponseDTO result = flightService.updateFlight(flightId, flightRequestDTO);
 
         // Assert
         assertNotNull(result);
         assertEquals(flightResponseDTO, result);
 
         verify(flightRepository, times(1)).findById(flightId);
-        verify(flightMapper, times(1)).toEntity(any(FlightRequestDTO.class)); // Mapper.toEntity not called if no change for validation
+        verify(flightMapper, never()).toEntity(any(FlightRequestDTO.class)); // Mapper.toEntity not called if no change for validation
         verify(flightRepository, never()).dailyFlightCount(
                 anyString(), anyString(), anyString(), any(LocalDateTime.class), any(LocalDateTime.class)
         ); // No validation check performed
-        verify(flightMapper, times(1)).toResponseDto(flightEntity); // And converted
+        verify(flightMapper, times(2)).fixTimeZone(flightResponseDTO); // And converted
     }
 
 
@@ -279,11 +340,25 @@ class FlightServiceTest {
         // Arrange
         Long flightId = 2L;
         LocalDateTime newDepartureTime = testDepartureTime.plusDays(1);
-        FlightRequestDTO updatedRequestDTO = new FlightRequestDTO(newDepartureTime, 100, 100, "DL", "LAX", "SEA");
+
+        FlightRequestDTO updatedRequestDTO = new FlightRequestDTO();
+        updatedRequestDTO.setDepartureTime(newDepartureTime);
+        updatedRequestDTO.setDuration(120);
+        updatedRequestDTO.setPrice(150.0);
+        updatedRequestDTO.setSeatCount(100);
+        updatedRequestDTO.setAirlineCode("THY");
+        updatedRequestDTO.setOriginAirportCode("LAX");
+        updatedRequestDTO.setDestinationAirportCode("SEA");
+
         Flight updatedFlightEntityForValidation = new Flight(); // Entity for validation check
         updatedFlightEntityForValidation.setId(flightId);
         updatedFlightEntityForValidation.setDepartureTime(newDepartureTime);
-        updatedFlightEntityForValidation.setAirline(new Airline("THY", "Delta"));
+        updatedFlightEntityForValidation.setArrivalTime(newDepartureTime.plusHours(2));
+        updatedFlightEntityForValidation.setDuration(120);
+        updatedFlightEntityForValidation.setPrice(150.0);
+        updatedFlightEntityForValidation.setSeatCount(100);
+        updatedFlightEntityForValidation.setAirline(new Airline());
+        updatedFlightEntityForValidation.getAirline().setCode("THY");
         updatedFlightEntityForValidation.setOriginAirport(new Airport("LAX", "Los Angeles"));
         updatedFlightEntityForValidation.setDestinationAirport(new Airport("SEA", "Seattle"));
 
@@ -295,6 +370,7 @@ class FlightServiceTest {
         when(authentication.getName()).thenReturn(username);
         SecurityContextHolder.setContext(securityContext);
 
+        flightEntity.setDepartureTime(LocalDateTime.now());
         when(flightRepository.findById(flightId)).thenReturn(Optional.of(flightEntity));
         when(flightMapper.toEntity(updatedRequestDTO)).thenReturn(updatedFlightEntityForValidation); // For hasFlightAttrChanged/validateFlightLimit
 
@@ -358,7 +434,9 @@ class FlightServiceTest {
     void validateAirlineStaffAuthorization_shouldThrowUnauthorizedActionException_whenUserIsNotAirlineStaff() {
         // Arrange
         String username = "notStaffUser";
-        User user = new User(username, "password", "test@test.com", Role.ROLE_USER, null);
+        User user = new User();
+        user.setUsername(username);
+        user.setRole(Role.ROLE_USER);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
         when(userRepository.findById(username)).thenReturn(Optional.of(user));
@@ -374,7 +452,10 @@ class FlightServiceTest {
     void validateAirlineStaffAuthorization_shouldThrowUnauthorizedActionException_whenUserIsFromOtherAirline() {
         Airline testAirline = new Airline("DL", "Delta Airlines");
         String username = "diffAirlineUser";
-        User user = new User(username, "password", "test@test.com", Role.ROLE_AIRLINE_STAFF, testAirline);
+        User user = new User();
+        user.setUsername(username);
+        user.setRole(Role.ROLE_AIRLINE_STAFF);
+        user.setAirline(testAirline);
         when(userRepository.findById(username)).thenReturn(Optional.of(user));
 
         // Mock security context and authentication

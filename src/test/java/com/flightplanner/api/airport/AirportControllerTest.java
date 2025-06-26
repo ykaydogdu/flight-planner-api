@@ -39,7 +39,7 @@ class AirportControllerTest {
 
         when(airportService.getAllAirports()).thenReturn(airports);
 
-        mockMvc.perform(get("/api/v1/airports/")
+        mockMvc.perform(get("/api/v1/airports")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].code").value("JFK"))
@@ -56,7 +56,7 @@ class AirportControllerTest {
 
         when(airportService.createAirport(any(Airport.class))).thenReturn(airport);
 
-        mockMvc.perform(post("/api/v1/airports/")
+        mockMvc.perform(post("/api/v1/airports")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"code\":\"JFK\",\"name\":\"John F. Kennedy International Airport\"}"))
                 .andExpect(status().isOk())

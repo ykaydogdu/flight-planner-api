@@ -1,5 +1,6 @@
 package com.flightplanner.api.airline;
 
+import com.flightplanner.api.airline.dto.AirlineWithStaffCountDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -34,41 +35,46 @@ class AirlineControllerTest {
 
     @Test
     void testGetAllAirlines() throws Exception {
-        List<Airline> airlines = Arrays.asList(new Airline("AA", "American Airlines"),
-                                               new Airline("DL", "Delta Airlines"));
+        List<AirlineWithStaffCountDTO> airlines = Arrays.asList(
+            new AirlineWithStaffCountDTO("AA", "American Airlines", 100),
+            new AirlineWithStaffCountDTO("DL", "Delta Airlines", 200)
+        );
 
         when(airlineService.getAllAirlines()).thenReturn(airlines);
 
-        mockMvc.perform(get("/api/v1/airlines/")
+        mockMvc.perform(get("/api/v1/airlines")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].code").value("AA"))
                 .andExpect(jsonPath("$[0].name").value("American Airlines"))
+                .andExpect(jsonPath("$[0].staffCount").value(100))
                 .andExpect(jsonPath("$[1].code").value("DL"))
-                .andExpect(jsonPath("$[1].name").value("Delta Airlines"));
+                .andExpect(jsonPath("$[1].name").value("Delta Airlines"))
+                .andExpect(jsonPath("$[1].staffCount").value(200));
 
         verify(airlineService).getAllAirlines();
     }
 
     @Test
     void testAddAirline() throws Exception {
-        Airline airline = new Airline("AA", "American Airlines");
+        AirlineWithStaffCountDTO airline = new AirlineWithStaffCountDTO("AA", "American Airlines", 100);
 
         when(airlineService.addAirline(any(Airline.class))).thenReturn(airline);
 
-        mockMvc.perform(post("/api/v1/airlines/")
+        mockMvc.perform(post("/api/v1/airlines")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"code\":\"AA\",\"name\":\"American Airlines\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value("AA"))
-                .andExpect(jsonPath("$.name").value("American Airlines"));
+                .andExpect(jsonPath("$.name").value("American Airlines"))
+                .andExpect(jsonPath("$.staffCount").value(100));
 
         verify(airlineService).addAirline(any(Airline.class));
     }
 
     @Test
     void testGetAirlineByCode() throws Exception {
-        Airline airline = new Airline("AA", "American Airlines");
+        AirlineWithStaffCountDTO airline = new AirlineWithStaffCountDTO("AA", "American Airlines", 100);
 
         when(airlineService.getAirlineByCode("AA")).thenReturn(airline);
 
@@ -76,7 +82,8 @@ class AirlineControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("AA"))
-                .andExpect(jsonPath("$.name").value("American Airlines"));
+                .andExpect(jsonPath("$.name").value("American Airlines"))
+                .andExpect(jsonPath("$.staffCount").value(100));
 
         verify(airlineService).getAirlineByCode("AA");
     }
@@ -87,7 +94,7 @@ class AirlineControllerTest {
 
         mockMvc.perform(delete("/api/v1/airlines/AA")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(airlineService).deleteAirline("AA");
     }

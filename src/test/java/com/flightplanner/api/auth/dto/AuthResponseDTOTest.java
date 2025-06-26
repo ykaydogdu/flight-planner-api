@@ -1,5 +1,6 @@
 package com.flightplanner.api.auth.dto;
 
+import com.flightplanner.api.user.User;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,9 +17,11 @@ class AuthResponseDTOTest {
 
     @Test
     void testAuthResponseDTOConstructor() {
-        AuthResponseDTO authResponse = new AuthResponseDTO("sampleToken");
+        User user = new User(); // Assuming User is a valid class
+        AuthResponseDTO authResponse = new AuthResponseDTO("sampleToken", user);
 
         assertEquals("sampleToken", authResponse.getToken());
+        assertEquals(user, authResponse.getUser());
     }
 
     @Test

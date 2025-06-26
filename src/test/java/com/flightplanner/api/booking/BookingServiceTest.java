@@ -60,7 +60,6 @@ class BookingServiceTest {
 
         bookingResponseDTO = new BookingResponseDTO();
         bookingResponseDTO.setFlightId(1L);
-        bookingResponseDTO.setUsername("testUser");
         bookingResponseDTO.setNumberOfSeats(2);
     }
 
@@ -69,7 +68,7 @@ class BookingServiceTest {
         // Arrange
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
         when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
-        when(bookingRepository.countBookedSeatsForFlight(1L)).thenReturn(50);
+        when(bookingRepository.countBookedSeatsForFlight(1L)).thenReturn(50L);
         when(bookingRepository.save(any())).thenReturn(new Booking(1L, flight, user, 2));
 
         // Act
@@ -78,7 +77,6 @@ class BookingServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(bookingResponseDTO.getFlightId(), result.getFlightId());
-        assertEquals(bookingResponseDTO.getUsername(), result.getUsername());
         assertEquals(bookingResponseDTO.getNumberOfSeats(), result.getNumberOfSeats());
         verify(bookingRepository, times(1)).save(any());
     }
@@ -88,7 +86,7 @@ class BookingServiceTest {
         // Arrange
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
         when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
-        when(bookingRepository.countBookedSeatsForFlight(1L)).thenReturn(99);
+        when(bookingRepository.countBookedSeatsForFlight(1L)).thenReturn(99L);
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> bookingService.createBooking(bookingRequestDTO));

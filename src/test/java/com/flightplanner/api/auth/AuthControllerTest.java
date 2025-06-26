@@ -3,6 +3,7 @@ package com.flightplanner.api.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flightplanner.api.auth.dto.AuthRequestDTO;
 import com.flightplanner.api.auth.dto.AuthResponseDTO;
+import com.flightplanner.api.auth.dto.RegisterRequestDTO;
 import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
@@ -67,11 +68,11 @@ public class AuthControllerTest {
     @Test
     void registerUser_success() throws Exception {
         // Arrange
+        RegisterRequestDTO requestDTO = new RegisterRequestDTO("testuser", "testpwd", "Test", "User", "testuser@example.com");
         User usr = new User("testuser", "testpwd");
-        AuthRequestDTO requestDTO = new AuthRequestDTO("testuser", "testpwd");
 
         // Act
-        when(authService.registerUser(requestDTO.getUsername(), requestDTO.getPassword())).thenReturn(usr);
+        when(authService.registerUser(requestDTO)).thenReturn(usr);
 
         // Assert
         mockMvc.perform(post("/api/v1/auth/register")
@@ -83,10 +84,10 @@ public class AuthControllerTest {
 
     @Test
     void registerUser_duplicate() throws Exception {
+        RegisterRequestDTO requestDTO = new RegisterRequestDTO("testuser", "testpwd", "Test", "User", "testuser@example.com");
         User usr = new User("testuser", "testpwd");
-        AuthRequestDTO requestDTO = new AuthRequestDTO("testuser", "testpwd");
 
-        when(authService.registerUser(requestDTO.getUsername(), requestDTO.getPassword())).thenReturn(usr);
+        when(authService.registerUser(requestDTO)).thenReturn(usr);
 
         mockMvc.perform(post("/api/v1/auth/register")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +95,7 @@ public class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string(usr.getUsername()));
 
-        when(authService.registerUser(requestDTO.getUsername(), requestDTO.getPassword()))
+        when(authService.registerUser(requestDTO))
                 .thenThrow(new UserAlreadyExistsException(requestDTO.getUsername()));
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -106,7 +107,7 @@ public class AuthControllerTest {
     @Test
     void loginUser_success() throws Exception {
         AuthRequestDTO requestDTO = new AuthRequestDTO("testuser", "testpwd");
-        AuthResponseDTO responseDTO = new AuthResponseDTO("testtoken");
+        AuthResponseDTO responseDTO = new AuthResponseDTO("testtoken", new User("testuser", "testpwd"));
 
         when(authService.authenticateAndGetJwt(requestDTO.getUsername(), requestDTO.getPassword())).thenReturn(responseDTO);
 
@@ -132,9 +133,9 @@ public class AuthControllerTest {
 
     @Test
     void registerUser_shouldReturnBadRequestWhenMissingFields() throws Exception {
-        AuthRequestDTO requestDTO = new AuthRequestDTO(null, "testpwd");
+        RegisterRequestDTO requestDTO = new RegisterRequestDTO(null, "testpwd", "Test", "User", "testuser@example.com");
 
-        when(authService.registerUser(requestDTO.getUsername(), requestDTO.getPassword()))
+        when(authService.registerUser(requestDTO))
                 .thenThrow(new IllegalArgumentException("Username cannot be null or empty"));
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -142,8 +143,8 @@ public class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
 
-        requestDTO = new AuthRequestDTO("testuser", null);
-        when(authService.registerUser(requestDTO.getUsername(), requestDTO.getPassword()))
+        requestDTO = new RegisterRequestDTO("testuser", null, "Test", "User", "testuser@example.com");
+        when(authService.registerUser(requestDTO))
                 .thenThrow(new IllegalArgumentException("Password cannot be null or empty"));
 
         mockMvc.perform(post("/api/v1/auth/register")

@@ -1,5 +1,6 @@
 package com.flightplanner.api.auth;
 
+import com.flightplanner.api.auth.dto.RegisterRequestDTO;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
 import com.flightplanner.api.user.Role;
@@ -40,13 +41,14 @@ class AuthServiceTest {
         String password = "testpassword";
         String encodedPassword = "encodedPassword";
 
+        RegisterRequestDTO registerRequest = new RegisterRequestDTO(username, password, "Test", "User", "test@example.com");
+
         when(userRepository.existsById(username)).thenReturn(false);
         when(bCryptPasswordEncoder.encode(password)).thenReturn(encodedPassword);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User user = authService.registerUser(username, password);
+        User user = authService.registerUser(registerRequest);
 
-        assertNotNull(user);
         assertEquals(username, user.getUsername());
         assertEquals(encodedPassword, user.getPassword());
         assertEquals(Role.ROLE_USER, user.getRole());
@@ -61,9 +63,11 @@ class AuthServiceTest {
         String username = "testuser";
         String password = "testpassword";
 
+        RegisterRequestDTO registerRequest = new RegisterRequestDTO(username, password, "Test", "User", "test@example.com");
+
         when(userRepository.existsById(username)).thenReturn(true);
 
-        assertThrows(UserAlreadyExistsException.class, () -> authService.registerUser(username, password));
+        assertThrows(UserAlreadyExistsException.class, () -> authService.registerUser(registerRequest));
 
         verify(userRepository).existsById(username);
         verifyNoInteractions(bCryptPasswordEncoder);
@@ -74,7 +78,9 @@ class AuthServiceTest {
     void testRegisterUserThrowsExceptionWhenUsernameIsNull() {
         String password = "testpassword";
 
-        assertThrows(IllegalArgumentException.class, () -> authService.registerUser(null, password));
+        RegisterRequestDTO registerRequest = new RegisterRequestDTO(null, password, "Test", "User", "test@example.com");
+
+        assertThrows(IllegalArgumentException.class, () -> authService.registerUser(registerRequest));
 
         verifyNoInteractions(userRepository);
         verifyNoInteractions(bCryptPasswordEncoder);
@@ -85,7 +91,9 @@ class AuthServiceTest {
     void testRegisterUserThrowsExceptionWhenPasswordIsNull() {
         String username = "testuser";
 
-        assertThrows(IllegalArgumentException.class, () -> authService.registerUser(username, null));
+        RegisterRequestDTO registerRequest = new RegisterRequestDTO(username, null, "Test", "User", "test@example.com");
+
+        assertThrows(IllegalArgumentException.class, () -> authService.registerUser(registerRequest));
 
         verifyNoInteractions(userRepository);
         verifyNoInteractions(bCryptPasswordEncoder);
