@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/bookings")
 public class BookingController {
@@ -50,5 +52,16 @@ public class BookingController {
     public ResponseEntity<Void> deleteBooking(@PathVariable(name = "id") Long id) {
         bookingService.deleteBooking(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/my-bookings")
+    @Operation(summary = "Get all bookings for the authenticated user", description = "Retrieves all bookings made by the authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookings retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
+    public ResponseEntity<List<BookingResponseDTO>> getMyBookings() {
+        List<BookingResponseDTO> bookings = bookingService.getMyBookings();
+        return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 }

@@ -8,7 +8,11 @@ import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.flight.Flight;
 import com.flightplanner.api.flight.FlightRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -33,7 +37,7 @@ public class BookingService {
         }
 
         // check for available seats
-        int availableSeats = flight.getSeatCount() - bookingRepository.countBookedSeatsForFlight(bookingRequestDTO.getFlightId());
+        int availableSeats = (int)(flight.getSeatCount() - bookingRepository.countBookedSeatsForFlight(bookingRequestDTO.getFlightId()));
         if (availableSeats <= bookingRequestDTO.getNumberOfSeats()) {
             throw new NotEnoughSeatsException(flight.getId(), bookingRequestDTO.getNumberOfSeats(), availableSeats);
         }
@@ -55,6 +59,17 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Booking"));
         bookingRepository.delete(booking);
+    }
+
+    public List<BookingResponseDTO> getMyBookings() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        userRepository.findById(username)
+                .orElseThrow(() -> new NotFoundException("User"));
+        return bookingRepository.findAllByUsername(username)
+                .stream()
+                .map(this::getBookingResponseDTO)
+                .toList();
     }
 
     private BookingResponseDTO getBookingResponseDTO(Booking booking) {

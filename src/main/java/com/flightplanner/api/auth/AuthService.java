@@ -39,8 +39,6 @@ public class AuthService {
 
     /**
      * Tries to create a new user with given credentials.
-     * @param username The username to be assigned
-     * @param password The plain password
      * @return The created user entity
      */
     public User registerUser(final RegisterRequestDTO registerRequest) {
