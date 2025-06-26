@@ -1,5 +1,7 @@
 package com.flightplanner.api.booking.dto;
 
+import com.flightplanner.api.airline.Airline;
+import com.flightplanner.api.airport.Airport;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +16,12 @@ import java.time.LocalDateTime;
 public class BookingResponseDTO {
     private long id;
     private long flightId;
-    private String username;
     private double price;
     private int numberOfSeats;
-    private String airlineCode;
-    private String originAirportCode;
-    private String destinationAirportCode;
+    private Airline airline;
+    private Airport originAirport;
+    private Airport destinationAirport;
     private LocalDateTime departureTime;
+    private int flightDuration;
+    private LocalDateTime arrivalTime;
 }

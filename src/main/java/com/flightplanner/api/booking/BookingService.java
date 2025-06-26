@@ -74,18 +74,19 @@ public class BookingService {
 
     private BookingResponseDTO getBookingResponseDTO(Booking booking) {
         Flight flight = booking.getFlight();
-        User user = booking.getUser();
+//        User user = booking.getUser();
 
         return BookingResponseDTO.builder()
                 .id(booking.getId())
                 .flightId(flight.getId())
-                .username(user.getUsername())
                 .price(flight.getPrice())
                 .numberOfSeats(booking.getNumberOfSeats())
-                .airlineCode(flight.getAirline().getCode())
-                .originAirportCode(flight.getOriginAirport().getCode())
-                .destinationAirportCode(flight.getDestinationAirport().getCode())
+                .airline(flight.getAirline())
+                .originAirport(flight.getOriginAirport())
+                .destinationAirport(flight.getDestinationAirport())
                 .departureTime(flight.getDepartureTime())
+                .flightDuration(flight.getDuration())
+                .arrivalTime(flight.getArrivalTime())
                 .build();
     }
 }
