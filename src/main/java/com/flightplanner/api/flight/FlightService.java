@@ -11,7 +11,6 @@ import com.flightplanner.api.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -162,7 +161,7 @@ public class FlightService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userRepository.findById(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+                .orElseThrow(() -> new NotFoundException("User", new HashMap<>(){{put("username", username);}}));
         if (!user.getRole().name().equals("ROLE_AIRLINE_STAFF") || !user.getAirline().getCode().equals(airlineCode)) {
             throw new UnauthorizedActionException("You cannot alter the flights of another airline.");
         }
