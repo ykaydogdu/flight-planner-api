@@ -1,5 +1,8 @@
 package com.flightplanner.api.flight;
 
+import com.flightplanner.api.booking.BookingService;
+import com.flightplanner.api.booking.dto.BookingRequestDTO;
+import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,10 +21,12 @@ import java.util.List;
 public class FlightController {
 
     private final FlightService flightService;
+    private final BookingService bookingService;
 
     @Autowired
-    FlightController(FlightService flightService) {
+    FlightController(FlightService flightService, BookingService bookingService) {
         this.flightService = flightService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping("")
@@ -80,5 +85,11 @@ public class FlightController {
     ResponseEntity<Void> deleteFlight(@PathVariable Long id) {
         flightService.deleteFlight(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{id}/book")
+    public ResponseEntity<BookingResponseDTO> bookFlight(@PathVariable Long id, @RequestBody BookingRequestDTO dto) {
+        BookingResponseDTO bookingResponseDTO = bookingService.bookFlight(id, dto);
+        return new ResponseEntity<>(bookingResponseDTO, HttpStatus.CREATED);
     }
 }

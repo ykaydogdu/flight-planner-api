@@ -68,11 +68,10 @@ public class FlightMapper {
                 departureTime,
                 dto.getDuration(),
                 arrivalTime,
-                dto.getPrice(),
-                dto.getSeatCount(),
                 airline,
                 originAirport,
-                destinationAirport
+                destinationAirport,
+                dto.getFlightClasses()
         );
     }
 
@@ -87,9 +86,8 @@ public class FlightMapper {
         flight.setOriginAirport(airportService.getAirportByCode(requestDTO.getOriginAirportCode()));
         flight.setDestinationAirport(airportService.getAirportByCode(requestDTO.getDestinationAirportCode()));
         flight.setDepartureTime(requestDTO.getDepartureTime());
-        flight.setPrice(requestDTO.getPrice());
-        flight.setSeatCount(requestDTO.getSeatCount());
         flight.setDuration(requestDTO.getDuration());
+        flight.setClasses(requestDTO.getFlightClasses());
         return flight;
     }
 
