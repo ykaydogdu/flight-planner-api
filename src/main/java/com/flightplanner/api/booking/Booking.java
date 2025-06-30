@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -37,10 +38,14 @@ public class Booking {
     @Column(name = "total_price", nullable = false)
     private double totalPrice;
 
+    @Column(name = "booking_date", nullable = false)
+    private LocalDateTime bookingDate = LocalDateTime.now();
+
     public Booking(Flight flight, User user, List<BookingPassenger> passengers) {
         this.flight = flight;
         this.user = user;
         this.passengers = passengers;
+        passengers.forEach(passenger -> passenger.setBooking(this));
         this.totalPrice = passengers.stream()
                 .mapToDouble(BookingPassenger::getPriceAtBooking)
                 .sum();

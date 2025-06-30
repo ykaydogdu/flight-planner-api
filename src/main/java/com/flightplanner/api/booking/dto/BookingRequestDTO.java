@@ -1,6 +1,5 @@
 package com.flightplanner.api.booking.dto;
 
-import com.flightplanner.api.booking.passenger.BookingPassenger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.List;
 public class BookingRequestDTO {
     private long flightId;
     private String username;
-    private List<BookingPassenger> passengers;
+    private List<BookingPassengerRequestDTO> passengers;
 
     public int getNumberOfSeats() {
         return passengers != null ? passengers.size() : 0;

@@ -3,11 +3,15 @@ package com.flightplanner.api.flight;
 import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
+import com.flightplanner.api.flight.dto.FlightResponseClassDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
 import com.flightplanner.api.UnauthorizedActionException;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
+import com.flightplanner.api.flight.classes.FlightClassRepository;
+import com.flightplanner.api.flight.classes.FlightClass;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,19 +28,21 @@ import java.util.List;
 public class FlightService {
 
     private final FlightRepository flightRepository;
+    private final FlightClassRepository flightClassRepository;
     private final FlightMapper flightMapper;
     private static final int MAX_DAILY_FLIGHTS = 3;
 
     private final UserRepository userRepository;
 
     @Autowired
-    public FlightService(final FlightRepository flightRepository, final FlightMapper flightMapper, UserRepository userRepository) {
+    public FlightService(final FlightRepository flightRepository, final FlightClassRepository flightClassRepository, final FlightMapper flightMapper, UserRepository userRepository) {
         this.flightRepository = flightRepository;
+        this.flightClassRepository = flightClassRepository;
         this.flightMapper = flightMapper;
         this.userRepository = userRepository;
     }
 
-    public List<FlightResponseDTO> getAllFlights(String airlineCode,
+    public List<FlightResponseClassDTO> getAllFlights(String airlineCode,
                                                  String originAirportCode,
                                                  String destinationAirportCode,
                                                  LocalDate departureDate) {
@@ -47,7 +53,11 @@ public class FlightService {
                 departureDate != null ? departureDate.atStartOfDay() : null,
                 departureDate != null ? departureDate.atTime(LocalTime.MAX) : null
         );
-        return flights;
+        flights.forEach(flightMapper::fixTimeZone);
+        return flights.stream().map(flight -> {
+            List<FlightClass> flightClasses = flightClassRepository.findByFlightId(flight.getId());
+            return flightMapper.toResponseClassDTO(flight, flightClasses);
+        }).toList();
     }
 
     public List<FlightResponseDTO> getAllFlights() {

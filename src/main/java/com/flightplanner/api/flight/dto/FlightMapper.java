@@ -7,12 +7,14 @@ import com.flightplanner.api.airport.Airport;
 import com.flightplanner.api.airport.AirportRepository;
 import com.flightplanner.api.airport.AirportService;
 import com.flightplanner.api.flight.Flight;
+import com.flightplanner.api.flight.classes.FlightClass;
 import com.flightplanner.api.timezone.TimezoneService;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 @Service
@@ -91,6 +93,21 @@ public class FlightMapper {
         return flight;
     }
 
+    public FlightResponseClassDTO toResponseClassDTO(FlightResponseDTO flightResponseDTO, List<FlightClass> flightClasses) {
+        return FlightResponseClassDTO.builder()
+                .id(flightResponseDTO.getId())
+                .minPrice(flightResponseDTO.getMinPrice())
+                .seatCount(flightResponseDTO.getSeatCount())
+                .emptySeats(flightResponseDTO.getEmptySeats())
+                .departureTime(flightResponseDTO.getDepartureTime())
+                .duration(flightResponseDTO.getDuration())
+                .arrivalTime(flightResponseDTO.getArrivalTime())
+                .airline(flightResponseDTO.getAirline())
+                .originAirport(flightResponseDTO.getOriginAirport())
+                .destinationAirport(flightResponseDTO.getDestinationAirport())
+                .classes(flightClasses)
+                .build();
+    }
 }
 
 

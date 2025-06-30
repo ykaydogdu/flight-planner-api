@@ -4,6 +4,7 @@ import com.flightplanner.api.booking.BookingService;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
+import com.flightplanner.api.flight.dto.FlightResponseClassDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,13 +35,13 @@ public class FlightController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of flights"),
     })
-    ResponseEntity<List<FlightResponseDTO>> getAllFlights(
+    ResponseEntity<List<FlightResponseClassDTO>> getAllFlights(
             @RequestParam(required = false) String airlineCode,
             @RequestParam(required = false) String originAirportCode,
             @RequestParam(required = false) String destinationAirportCode,
             @RequestParam(required = false) LocalDate departureDate
     ) {
-        List<FlightResponseDTO> flights = flightService.getAllFlights(airlineCode, originAirportCode, destinationAirportCode, departureDate);
+        List<FlightResponseClassDTO> flights = flightService.getAllFlights(airlineCode, originAirportCode, destinationAirportCode, departureDate);
         return ResponseEntity.ok(flights);
     }
 
@@ -88,6 +89,12 @@ public class FlightController {
     }
 
     @PostMapping("/{id}/book")
+    @Operation(summary = "Book a flight", description = "Books a flight with the specified ID using the provided details.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Flight booked successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid booking request data"),
+            @ApiResponse(responseCode = "404", description = "Flight not found"),
+    })
     public ResponseEntity<BookingResponseDTO> bookFlight(@PathVariable Long id, @RequestBody BookingRequestDTO dto) {
         BookingResponseDTO bookingResponseDTO = bookingService.bookFlight(id, dto);
         return new ResponseEntity<>(bookingResponseDTO, HttpStatus.CREATED);

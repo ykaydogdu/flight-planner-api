@@ -4,6 +4,7 @@ import com.flightplanner.api.NotFoundException;
 import com.flightplanner.api.booking.dto.BookingPassengerResponseDTO;
 import com.flightplanner.api.booking.exception.NotEnoughSeatsException;
 import com.flightplanner.api.booking.passenger.BookingPassenger;
+import com.flightplanner.api.booking.passenger.BookingPassengerRepository;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
@@ -25,11 +26,13 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final FlightRepository flightRepository;
     private final UserRepository userRepository;
+    private final BookingPassengerRepository bookingPassengerRepository;
 
-    public BookingService(BookingRepository bookingRepository, FlightRepository flightRepository, UserRepository userRepository) {
+    public BookingService(BookingRepository bookingRepository, FlightRepository flightRepository, UserRepository userRepository, BookingPassengerRepository bookingPassengerRepository) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
         this.userRepository = userRepository;
+        this.bookingPassengerRepository = bookingPassengerRepository;
     }
 
     public BookingResponseDTO bookFlight(long flightId, BookingRequestDTO bookingRequestDTO) {
@@ -42,11 +45,6 @@ public class BookingService {
             throw new IllegalArgumentException("Invalid number of seats requested");
         }
 
-        // check for available seats
-        if (!flight.checkAvailability(bookingRequestDTO.getPassengers())) {
-            throw new NotEnoughSeatsException(flight.getId());
-        }
-
         List<BookingPassenger> passengers = bookingRequestDTO.getPassengers().stream()
                 .map(passenger -> BookingPassenger.builder()
                         .firstName(passenger.getFirstName())
@@ -57,8 +55,14 @@ public class BookingService {
                         .build())
                 .toList();
 
+        // check for available seats
+        if (!flight.checkAvailability(passengers)) {
+            throw new NotEnoughSeatsException(flight.getId());
+        }
+
         Booking booking = new Booking(flight, user, passengers);
         Booking savedBooking = bookingRepository.save(booking);
+        bookingPassengerRepository.saveAll(passengers);
 
         // Sum seat counts for each flight class
         List<FlightClassSeatCountDTO> flightClassSeatCounts = passengers.stream()
