@@ -1,6 +1,5 @@
 package com.flightplanner.api.booking;
 
-import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,17 +18,6 @@ public class BookingController {
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
-    }
-
-    @PostMapping("/create")
-    @Operation(summary = "Create a new booking", description = "Creates a new booking with the provided details.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Booking created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid booking request")
-    })
-    public ResponseEntity<BookingResponseDTO> createBooking(@RequestBody BookingRequestDTO bookingRequestDTO) {
-        BookingResponseDTO bookingResponseDTO = bookingService.createBooking(bookingRequestDTO);
-        return new ResponseEntity<>(bookingResponseDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

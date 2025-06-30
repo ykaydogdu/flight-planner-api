@@ -1,17 +1,22 @@
 package com.flightplanner.api.booking;
 
 import com.flightplanner.api.NotFoundException;
+import com.flightplanner.api.booking.dto.BookingPassengerResponseDTO;
 import com.flightplanner.api.booking.exception.NotEnoughSeatsException;
+import com.flightplanner.api.booking.passenger.BookingPassenger;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.flight.Flight;
 import com.flightplanner.api.flight.FlightRepository;
+import com.flightplanner.api.flight.dto.FlightClassSeatCountDTO;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,23 +32,44 @@ public class BookingService {
         this.userRepository = userRepository;
     }
 
-    public BookingResponseDTO createBooking(BookingRequestDTO bookingRequestDTO) {
-        Flight flight = flightRepository.findById(bookingRequestDTO.getFlightId())
+    public BookingResponseDTO bookFlight(long flightId, BookingRequestDTO bookingRequestDTO) {
+        Flight flight = flightRepository.findById(flightId)
                 .orElseThrow(() -> new NotFoundException("Flight"));
         User user = userRepository.findById(bookingRequestDTO.getUsername())
                 .orElseThrow(() -> new NotFoundException("User"));
+
         if (bookingRequestDTO.getNumberOfSeats() <= 0) {
             throw new IllegalArgumentException("Invalid number of seats requested");
         }
 
         // check for available seats
-        int availableSeats = (int)(flight.getSeatCount() - bookingRepository.countBookedSeatsForFlight(bookingRequestDTO.getFlightId()));
-        if (availableSeats <= bookingRequestDTO.getNumberOfSeats()) {
-            throw new NotEnoughSeatsException(flight.getId(), bookingRequestDTO.getNumberOfSeats(), availableSeats);
+        if (!flight.checkAvailability(bookingRequestDTO.getPassengers())) {
+            throw new NotEnoughSeatsException(flight.getId());
         }
 
-        Booking booking = new Booking(flight, user, bookingRequestDTO.getNumberOfSeats());
+        List<BookingPassenger> passengers = bookingRequestDTO.getPassengers().stream()
+                .map(passenger -> BookingPassenger.builder()
+                        .firstName(passenger.getFirstName())
+                        .lastName(passenger.getLastName())
+                        .email(passenger.getEmail())
+                        .flightClass(passenger.getFlightClass())
+                        .priceAtBooking(passenger.getPriceAtBooking())
+                        .build())
+                .toList();
+
+        Booking booking = new Booking(flight, user, passengers);
         Booking savedBooking = bookingRepository.save(booking);
+
+        // Sum seat counts for each flight class
+        List<FlightClassSeatCountDTO> flightClassSeatCounts = passengers.stream()
+                .map(passenger -> FlightClassSeatCountDTO.builder()
+                        .flightClass(passenger.getFlightClass())
+                        .seatCount(1)
+                        .build())
+                .toList();
+        // Decrease the available seats
+        flight.decreaseAvailableSeats(flightClassSeatCounts);
+        flightRepository.save(flight); // cascades to flight classes
 
         return getBookingResponseDTO(savedBooking);
     }
@@ -74,19 +100,27 @@ public class BookingService {
 
     private BookingResponseDTO getBookingResponseDTO(Booking booking) {
         Flight flight = booking.getFlight();
-//        User user = booking.getUser();
+
+        List<BookingPassengerResponseDTO> passengerDTOs = new ArrayList<>();
+        for (BookingPassenger passenger : booking.getPassengers()) {
+            BookingPassengerResponseDTO passengerDTO = BookingPassengerResponseDTO.builder()
+                    .firstName(passenger.getFirstName())
+                    .lastName(passenger.getLastName())
+                    .email(passenger.getEmail())
+                    .priceAtBooking(passenger.getPriceAtBooking())
+                    .build();
+            passengerDTOs.add(passengerDTO);
+        }
 
         return BookingResponseDTO.builder()
                 .id(booking.getId())
-                .flightId(flight.getId())
-                .price(flight.getPrice())
-                .numberOfSeats(booking.getNumberOfSeats())
                 .airline(flight.getAirline())
                 .originAirport(flight.getOriginAirport())
                 .destinationAirport(flight.getDestinationAirport())
                 .departureTime(flight.getDepartureTime())
                 .flightDuration(flight.getDuration())
                 .arrivalTime(flight.getArrivalTime())
+                .passengers(passengerDTOs)
                 .build();
     }
 }
