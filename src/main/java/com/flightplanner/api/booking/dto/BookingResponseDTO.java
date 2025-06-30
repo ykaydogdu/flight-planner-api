@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,13 +16,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingResponseDTO {
     private long id;
-    private long flightId;
-    private double price;
-    private int numberOfSeats;
     private Airline airline;
     private Airport originAirport;
     private Airport destinationAirport;
     private LocalDateTime departureTime;
     private int flightDuration;
     private LocalDateTime arrivalTime;
+    private List<BookingPassengerResponseDTO> passengers;
 }

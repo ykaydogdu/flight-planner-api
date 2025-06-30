@@ -1,19 +1,18 @@
 package com.flightplanner.api.booking;
 
+import com.flightplanner.api.booking.passenger.BookingPassenger;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.flight.Flight;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.List;
 
 @Entity
 @Table(name = "bookings")
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class Booking {
@@ -32,12 +31,18 @@ public class Booking {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @Column(name = "number_of_seats", nullable = false)
-    private int numberOfSeats;
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookingPassenger> passengers;
 
-    public Booking(Flight flight, User user, int numberOfSeats) {
+    @Column(name = "total_price", nullable = false)
+    private double totalPrice;
+
+    public Booking(Flight flight, User user, List<BookingPassenger> passengers) {
         this.flight = flight;
         this.user = user;
-        this.numberOfSeats = numberOfSeats;
+        this.passengers = passengers;
+        this.totalPrice = passengers.stream()
+                .mapToDouble(BookingPassenger::getPriceAtBooking)
+                .sum();
     }
 }
