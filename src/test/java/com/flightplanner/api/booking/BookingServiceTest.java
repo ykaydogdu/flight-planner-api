@@ -144,7 +144,7 @@ class BookingServiceTest {
         when(flightRepository.save(any(Flight.class))).thenReturn(flight);
 
         // Act
-        BookingResponseDTO result = bookingService.bookFlight(1L, bookingRequestDTO);
+        BookingResponseDTO result = bookingService.bookFlight(bookingRequestDTO);
 
         // Assert
         assertNotNull(result);
@@ -167,7 +167,7 @@ class BookingServiceTest {
         when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> bookingService.bookFlight(1L, bookingRequestDTO));
+        assertThrows(RuntimeException.class, () -> bookingService.bookFlight(bookingRequestDTO));
         verify(bookingRepository, never()).save(any());
         verify(bookingPassengerRepository, never()).saveAll(anyList());
     }
@@ -178,7 +178,7 @@ class BookingServiceTest {
         when(flightRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> bookingService.bookFlight(1L, bookingRequestDTO));
+        assertThrows(RuntimeException.class, () -> bookingService.bookFlight(bookingRequestDTO));
         verify(bookingRepository, never()).save(any());
         verify(bookingPassengerRepository, never()).saveAll(anyList());
     }
@@ -190,7 +190,7 @@ class BookingServiceTest {
         when(userRepository.findById("testUser")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> bookingService.bookFlight(1L, bookingRequestDTO));
+        assertThrows(RuntimeException.class, () -> bookingService.bookFlight(bookingRequestDTO));
         verify(bookingRepository, never()).save(any());
         verify(bookingPassengerRepository, never()).saveAll(anyList());
     }

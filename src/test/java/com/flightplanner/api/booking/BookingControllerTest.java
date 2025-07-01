@@ -3,9 +3,7 @@ package com.flightplanner.api.booking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
-import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
-import com.flightplanner.api.booking.dto.BookingPassengerRequestDTO;
 import com.flightplanner.api.booking.dto.BookingPassengerResponseDTO;
 import com.flightplanner.api.flight.classes.FlightClassEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,46 +47,17 @@ public class BookingControllerTest {
     @BeforeEach
     void setUp() {
         objectMapper.registerModule(new JavaTimeModule());
-
-        // Create passenger request DTOs
-        BookingPassengerRequestDTO passenger1 = BookingPassengerRequestDTO.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .flightClass(FlightClassEnum.ECONOMY)
-                .priceAtBooking(100.0)
-                .build();
-        
-        BookingPassengerRequestDTO passenger2 = BookingPassengerRequestDTO.builder()
-                .firstName("Jane")
-                .lastName("Doe")
-                .email("jane.doe@example.com")
-                .flightClass(FlightClassEnum.ECONOMY)
-                .priceAtBooking(100.0)
-                .build();
-        
-        List<BookingPassengerRequestDTO> passengers = Arrays.asList(passenger1, passenger2);
-
         // Create passenger response DTOs
-        BookingPassengerResponseDTO passengerResponse1 = BookingPassengerResponseDTO.builder()
+        BookingPassengerResponseDTO passengerResponse = BookingPassengerResponseDTO.builder()
                 .passengerId(1)
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@example.com")
-                .flightClass("Economy")
+                .flightClass(FlightClassEnum.ECONOMY)
                 .priceAtBooking(100.0)
                 .build();
         
-        BookingPassengerResponseDTO passengerResponse2 = BookingPassengerResponseDTO.builder()
-                .passengerId(2)
-                .firstName("Jane")
-                .lastName("Doe")
-                .email("jane.doe@example.com")
-                .flightClass("Economy")
-                .priceAtBooking(100.0)
-                .build();
-        
-        List<BookingPassengerResponseDTO> passengerResponses = Arrays.asList(passengerResponse1, passengerResponse2);
+        List<BookingPassengerResponseDTO> passengerResponses = Arrays.asList(passengerResponse);
 
         bookingResponseDTO = BookingResponseDTO.builder()
                 .id(1L)
