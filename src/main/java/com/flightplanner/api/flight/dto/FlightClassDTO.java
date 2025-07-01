@@ -14,4 +14,5 @@ public class FlightClassDTO {
     private int seatCount;
     private int availableSeats;
     private double price;
+    private long flightId;
 }

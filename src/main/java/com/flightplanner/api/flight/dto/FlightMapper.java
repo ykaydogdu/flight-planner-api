@@ -77,6 +77,13 @@ public class FlightMapper {
         );
     }
 
+    public void fixTimeZone(FlightDTO dto) {
+        TimeZone originTimezone = timeZoneService.getTimezone(dto.getOriginAirport().getLatitude(), dto.getOriginAirport().getLongitude());
+        dto.setDepartureTime(timeZoneService.convertUtcToLocalDateTime(dto.getDepartureTime(), originTimezone));
+        TimeZone destinationTimezone = timeZoneService.getTimezone(dto.getDestinationAirport().getLatitude(), dto.getDestinationAirport().getLongitude());
+        dto.setArrivalTime(timeZoneService.convertUtcToLocalDateTime(dto.getArrivalTime(), destinationTimezone));
+    }
+
     public void fixTimeZone(FlightResponseDTO dto) {
         TimeZone originTimezone = timeZoneService.getTimezone(dto.getOriginAirport().getLatitude(), dto.getOriginAirport().getLongitude());
         dto.setDepartureTime(timeZoneService.convertUtcToLocalDateTime(dto.getDepartureTime(), originTimezone));
@@ -93,18 +100,18 @@ public class FlightMapper {
         return flight;
     }
 
-    public FlightResponseClassDTO toResponseClassDTO(FlightResponseDTO flightResponseDTO, List<FlightClassDTO> flightClasses) {
-        return FlightResponseClassDTO.builder()
-                .id(flightResponseDTO.getId())
-                .minPrice(flightResponseDTO.getMinPrice())
-                .seatCount(flightResponseDTO.getSeatCount())
-                .emptySeats(flightResponseDTO.getEmptySeats())
-                .departureTime(flightResponseDTO.getDepartureTime())
-                .duration(flightResponseDTO.getDuration())
-                .arrivalTime(flightResponseDTO.getArrivalTime())
-                .airline(flightResponseDTO.getAirline())
-                .originAirport(flightResponseDTO.getOriginAirport())
-                .destinationAirport(flightResponseDTO.getDestinationAirport())
+    public FlightResponseDTO toResponseDTO(FlightDTO flightDTO, List<FlightClassDTO> flightClasses) {
+        return FlightResponseDTO.builder()
+                .id(flightDTO.getId())
+                .minPrice(flightDTO.getMinPrice())
+                .seatCount(flightDTO.getSeatCount())
+                .emptySeats(flightDTO.getEmptySeats())
+                .departureTime(flightDTO.getDepartureTime())
+                .duration(flightDTO.getDuration())
+                .arrivalTime(flightDTO.getArrivalTime())
+                .airline(flightDTO.getAirline())
+                .originAirport(flightDTO.getOriginAirport())
+                .destinationAirport(flightDTO.getDestinationAirport())
                 .classes(flightClasses)
                 .build();
     }

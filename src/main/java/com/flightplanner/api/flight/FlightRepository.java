@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.flightplanner.api.flight.dto.FlightResponseDTO;
+import com.flightplanner.api.flight.dto.FlightDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +29,7 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     );
 
     @Query("""
-        select new com.flightplanner.api.flight.dto.FlightResponseDTO(
+        select new com.flightplanner.api.flight.dto.FlightDTO(
             f.id,
             (select min(fc.price) from FlightClass fc where fc.flight.id = f.id),
             (select sum(fc.seatCount) from FlightClass fc where fc.flight.id = f.id),
@@ -57,7 +57,7 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
         )
         group by f.id
     """)
-    List<FlightResponseDTO> findFilteredFlights(
+    List<FlightDTO> findFilteredFlights(
             @Param("airlineCode") String airlineCode,
             @Param("originAirportCode") String originAirportCode,
             @Param("destinationAirportCode") String destinationAirportCode,
@@ -70,7 +70,7 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     );
 
     @Query("""
-        select new com.flightplanner.api.flight.dto.FlightResponseDTO(
+        select new com.flightplanner.api.flight.dto.FlightDTO(
             f.id,
             (select min(fc.price) from FlightClass fc where fc.flight.id = f.id),
             (select sum(fc.seatCount) from FlightClass fc where fc.flight.id = f.id),
@@ -84,10 +84,10 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
         ) from Flight f
         group by f.id
     """)
-    List<FlightResponseDTO> findAllWithEmptySeats();
+    List<FlightDTO> findAllWithEmptySeats();
 
     @Query("""
-        select new com.flightplanner.api.flight.dto.FlightResponseDTO(
+        select new com.flightplanner.api.flight.dto.FlightDTO(
             f.id,
             (select min(fc.price) from FlightClass fc where fc.flight.id = f.id),
             (select sum(fc.seatCount) from FlightClass fc where fc.flight.id = f.id),
@@ -100,7 +100,8 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             f.destinationAirport
         ) from Flight f
         where f.id = :id
+        and (select sum(fc.seatCount) from FlightClass fc where fc.flight.id = f.id) > 0
         group by f.id
     """)
-    Optional<FlightResponseDTO> findByIdWithEmptySeats(@Param("id") Long id);
+    Optional<FlightDTO> findByIdWithEmptySeats(@Param("id") Long id);
 }

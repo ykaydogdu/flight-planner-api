@@ -4,8 +4,8 @@ import com.flightplanner.api.booking.BookingService;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
-import com.flightplanner.api.flight.dto.FlightResponseClassDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
+import com.flightplanner.api.flight.dto.FlightDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,7 +35,7 @@ public class FlightController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of flights"),
     })
-    ResponseEntity<List<FlightResponseClassDTO>> getAllFlights(
+    ResponseEntity<List<FlightResponseDTO>> getAllFlights(
             @RequestParam(required = false) String airlineCode,
             @RequestParam(required = false) String originAirportCode,
             @RequestParam(required = false) String destinationAirportCode,
@@ -45,7 +45,7 @@ public class FlightController {
             @RequestParam(required = false, defaultValue = "0") Integer passengerFirstClass,
             @RequestParam(required = false, defaultValue = "false") Boolean includePast
     ) {
-        List<FlightResponseClassDTO> flights = flightService.getAllFlights(
+        List<FlightResponseDTO> flights = flightService.getAllFlights(
                 airlineCode, 
                 originAirportCode, 
                 destinationAirportCode, 

@@ -1,7 +1,6 @@
 package com.flightplanner.api.flight;
 
 import com.flightplanner.api.NotFoundException;
-import com.flightplanner.api.flight.classes.FlightClass;
 import com.flightplanner.api.flight.dto.*;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
 import com.flightplanner.api.UnauthorizedActionException;
@@ -41,7 +40,7 @@ public class FlightService {
         this.userRepository = userRepository;
     }
 
-    public List<FlightResponseClassDTO> getAllFlights(String airlineCode,
+    public List<FlightResponseDTO> getAllFlights(String airlineCode,
                                                  String originAirportCode,
                                                  String destinationAirportCode,
                                                  LocalDate departureDate,
@@ -53,7 +52,7 @@ public class FlightService {
         // Handle null values for passenger counts
         boolean includeAllFlights = includePast != null && includePast;
         
-        List<FlightResponseDTO> flights = flightRepository.findFilteredFlights(
+        List<FlightDTO> flights = flightRepository.findFilteredFlights(
                 airlineCode,
                 originAirportCode,
                 destinationAirportCode,
@@ -68,35 +67,31 @@ public class FlightService {
 
         // batch load classes
         List<Long> flightIds = flights.stream()
-                .map(FlightResponseDTO::getId)
+                .map(FlightDTO::getId)
                 .toList();
-        List<FlightClass> flightClasses = flightClassRepository.findByFlightIds(flightIds);
+        List<FlightClassDTO> flightClasses = flightClassRepository.findByFlightIds(flightIds);
 
-        Map<Long, List<FlightClass>> classesByFlightId = flightClasses.stream()
-                .collect(Collectors.groupingBy(FlightClass::getFlightId));
+        Map<Long, List<FlightClassDTO>> classesByFlightId = flightClasses.stream()
+                .collect(Collectors.groupingBy(FlightClassDTO::getFlightId));
         
         return flights.stream()
                 .map(flight -> {
-                    List<FlightClass> classes = classesByFlightId.getOrDefault(flight.getId(), List.of());
-                    List<FlightClassDTO> classDTOs = classes.stream()
-                            .map(flightMapper::toClassDTO)
-                            .toList();
-                    return flightMapper.toResponseClassDTO(flight, classDTOs);
+                    List<FlightClassDTO> classes = classesByFlightId.getOrDefault(flight.getId(), List.of());
+                    return flightMapper.toResponseDTO(flight, classes);
                 })
                 .toList();
     }
 
     public List<FlightResponseDTO> getAllFlights() {
-        List<FlightResponseDTO> flights = flightRepository.findAllWithEmptySeats();
-        flights.forEach(flightMapper::fixTimeZone);
-        return flights;
+        return getAllFlights(null, null, null, null, 0, 0, 0, true);
     }
 
     public FlightResponseDTO getFlightById(final Long id) {
-        FlightResponseDTO flight = flightRepository.findByIdWithEmptySeats(id)
+        FlightDTO flight = flightRepository.findByIdWithEmptySeats(id)
                 .orElseThrow(() -> new NotFoundException("Flight", new HashMap<>(){{put("id", id);}}));
         flightMapper.fixTimeZone(flight);
-        return flight;
+        List<FlightClassDTO> flightClasses = flightClassRepository.findByFlightId(id);
+        return flightMapper.toResponseDTO(flight, flightClasses);
     }
 
     @Transactional

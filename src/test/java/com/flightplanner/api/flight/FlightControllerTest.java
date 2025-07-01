@@ -7,7 +7,6 @@ import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
-import com.flightplanner.api.flight.dto.FlightResponseClassDTO;
 import com.flightplanner.api.flight.classes.FlightClass;
 import com.flightplanner.api.flight.classes.FlightClassEnum;
 import com.flightplanner.api.booking.BookingService;
@@ -61,7 +60,7 @@ class FlightControllerTest {
     void getAllFlights_shouldReturnListOfFlights() throws Exception {
         // Arrange
         LocalDateTime now = LocalDateTime.now();
-        FlightResponseClassDTO flight1 = FlightResponseClassDTO.builder()
+        FlightResponseDTO flight1 = FlightResponseDTO.builder()
                 .id(1L)
                 .minPrice(100)
                 .seatCount(100)
@@ -75,7 +74,7 @@ class FlightControllerTest {
                 .classes(null) // Mock flight classes if needed
                 .build();
 
-        FlightResponseClassDTO flight2 = FlightResponseClassDTO.builder()
+        FlightResponseDTO flight2 = FlightResponseDTO.builder()
                 .id(2L)
                 .minPrice(100)
                 .seatCount(100)
@@ -89,7 +88,7 @@ class FlightControllerTest {
                 .classes(null) // Mock flight classes if needed
                 .build();
 
-        List<FlightResponseClassDTO> allFlights = Arrays.asList(flight1, flight2);
+        List<FlightResponseDTO> allFlights = Arrays.asList(flight1, flight2);
 
         // Mock service behavior
         when(flightService.getAllFlights(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(allFlights);
@@ -159,6 +158,7 @@ class FlightControllerTest {
                 .airline(null) // Mock airline object if needed
                 .originAirport(null) // Mock origin airport object if needed
                 .destinationAirport(null) // Mock destination airport object if needed
+                .classes(null)
                 .build();
 
         // Mock service behavior

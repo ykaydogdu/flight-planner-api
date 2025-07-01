@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,4 +28,5 @@ public class FlightResponseDTO {
     private Airline airline;
     private Airport originAirport;
     private Airport destinationAirport;
+    private List<FlightClassDTO> classes;
 }
