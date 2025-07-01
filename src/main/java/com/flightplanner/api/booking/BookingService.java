@@ -112,6 +112,7 @@ public class BookingService {
                     .firstName(passenger.getFirstName())
                     .lastName(passenger.getLastName())
                     .email(passenger.getEmail())
+                    .flightClass(passenger.getFlightClass())
                     .priceAtBooking(passenger.getPriceAtBooking())
                     .build();
             passengerDTOs.add(passengerDTO);

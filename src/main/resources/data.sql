@@ -23,7 +23,7 @@ INSERT INTO AIRPORT (code, name, city, country, latitude, longitude) VALUES ('LG
 
 -- Insert Users with BCrypt hashed passwords
 INSERT INTO APP_USER (username, password, first_name, last_name, email, role) VALUES ('user1', '$2y$12$zkiAcfx1qwgxVPxKTbzbl.j7u9wfrUtyfjO/e4u414mZMDmimcrtG', 'John', 'Doe', 'user1@example.com', 'ROLE_USER');
-INSERT INTO APP_USER (username, password, first_name, last_name, email, role) VALUES ('admin1', '$2y$12$mr/xmdBFqZJKe79x6WNGruc9qx9xTV8x0HRsGtIzfaIg6xl3GACG', 'Jane', 'Smith', 'admin1@example.com', 'ROLE_ADMIN');
+INSERT INTO APP_USER (username, password, first_name, last_name, email, role) VALUES ('admin1', '$2y$12$UFClXLp4B/UetCEY7jDzSeIbLxR5Mgt8JfSUXa3L1pA3oUXI75HQG', 'Jane', 'Smith', 'admin1@example.com', 'ROLE_ADMIN');
 INSERT INTO APP_USER (username, password, first_name, last_name, email, role) VALUES ('user2', '$2y$12$Xwx.qGQe7Vupvre70r1OU.n3757uBzI0zrwVbbtShLpyDUzvbgnue', 'Peter', 'Jones', 'user2@example.com', 'ROLE_USER');
 INSERT INTO APP_USER (username, password, first_name, last_name, email, role) VALUES ('user3', '$2y$12$sG/BXQwdLwNTWCL8NoxhPuOnt2lXqhgX64DBSeW4h5r8oPjNegnee', 'Alice', 'Williams', 'user3@example.com', 'ROLE_USER');
 INSERT INTO APP_USER (username, password, first_name, last_name, email, role) VALUES ('admin2', '$2y$12$zNf7czeuW4Nff7rrsDBt9.Thh1l9SM9dNwWaeEchCnQuMHNRdM3Z.', 'Bob', 'Brown', 'admin2@example.com', 'ROLE_ADMIN');

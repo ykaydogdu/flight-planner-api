@@ -1,5 +1,6 @@
 package com.flightplanner.api.booking.dto;
 
+import com.flightplanner.api.flight.classes.FlightClassEnum;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,6 +11,6 @@ public class BookingPassengerResponseDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private String flightClass;
+    private FlightClassEnum flightClass;
     private double priceAtBooking;
 }
