@@ -2,6 +2,7 @@ package com.flightplanner.api.flight;
 
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
+import com.flightplanner.api.flight.dto.FlightStatisticsResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -92,5 +93,20 @@ public class FlightController {
     ResponseEntity<Void> deleteFlight(@PathVariable Long id) {
         flightService.deleteFlight(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/stats")
+    @Operation(summary = "Get flight statistics", description = "Retrieves statistics for flights of a given airline, including total revenue, booking count.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Flight statistics retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Airline not found"),
+    })
+    ResponseEntity<FlightStatisticsResponseDTO> getFlightStatistics(
+            @RequestParam String airlineCode,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+        FlightStatisticsResponseDTO stats = flightService.getFlightStatistics(airlineCode, startDate, endDate);
+        return ResponseEntity.ok(stats);
     }
 }

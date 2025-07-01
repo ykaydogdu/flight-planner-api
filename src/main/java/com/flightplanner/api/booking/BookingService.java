@@ -86,6 +86,20 @@ public class BookingService {
         return getBookingResponseDTO(booking);
     }
 
+    public List<BookingResponseDTO> getBookingByFlightId(Long flightId) {
+        flightRepository.findById(flightId)
+                .orElseThrow(() -> new NotFoundException("Flight"));
+
+        List<Booking> bookings = bookingRepository.findAllByFlightId(flightId);
+        if (bookings.isEmpty()) {
+            throw new NotFoundException("No bookings found for this flight");
+        }
+
+        return bookings.stream()
+                .map(this::getBookingResponseDTO)
+                .toList();
+    }
+
     public void deleteBooking(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Booking"));
@@ -106,6 +120,7 @@ public class BookingService {
     private BookingResponseDTO getBookingResponseDTO(Booking booking) {
         Flight flight = booking.getFlight();
 
+        double totalPrice = 0;
         List<BookingPassengerResponseDTO> passengerDTOs = new ArrayList<>();
         for (BookingPassenger passenger : booking.getPassengers()) {
             BookingPassengerResponseDTO passengerDTO = BookingPassengerResponseDTO.builder()
@@ -116,6 +131,7 @@ public class BookingService {
                     .priceAtBooking(passenger.getPriceAtBooking())
                     .build();
             passengerDTOs.add(passengerDTO);
+            totalPrice += passenger.getPriceAtBooking();
         }
 
         return BookingResponseDTO.builder()
@@ -128,6 +144,7 @@ public class BookingService {
                 .arrivalTime(flight.getArrivalTime())
                 .passengers(passengerDTOs)
                 .bookingDate(booking.getBookingDate())
+                .totalPrice(totalPrice)
                 .build();
     }
 }

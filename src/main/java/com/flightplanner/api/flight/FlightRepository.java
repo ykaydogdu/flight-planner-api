@@ -1,5 +1,6 @@
 package com.flightplanner.api.flight;
 
+import com.flightplanner.api.flight.dto.FlightStatisticsDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.flightplanner.api.flight.dto.FlightDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -82,26 +84,32 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             f.originAirport,
             f.destinationAirport
         ) from Flight f
-        group by f.id
-    """)
-    List<FlightDTO> findAllWithEmptySeats();
-
-    @Query("""
-        select new com.flightplanner.api.flight.dto.FlightDTO(
-            f.id,
-            (select min(fc.price) from FlightClass fc where fc.flight.id = f.id),
-            (select sum(fc.seatCount) from FlightClass fc where fc.flight.id = f.id),
-            (select sum(fc.availableSeats) from FlightClass fc where fc.flight.id = f.id),
-            f.departureTime,
-            f.duration,
-            f.arrivalTime,
-            f.airline,
-            f.originAirport,
-            f.destinationAirport
-        ) from Flight f
         where f.id = :id
         and (select sum(fc.seatCount) from FlightClass fc where fc.flight.id = f.id) > 0
         group by f.id
     """)
     Optional<FlightDTO> findByIdWithEmptySeats(@Param("id") Long id);
+
+    @Query("""
+    SELECT new com.flightplanner.api.flight.dto.FlightStatisticsDTO(
+        f.id,
+        COUNT(DISTINCT b.id),
+        SUM(fc.seatCount - fc.availableSeats),
+        SUM((fc.seatCount - fc.availableSeats) * fc.price)
+    )
+    FROM Flight f
+    LEFT JOIN Booking b ON b.flight.id = f.id
+    LEFT JOIN FlightClass fc ON fc.flight.id = f.id
+    WHERE f.airline.code = :airlineCode
+    AND f.departureTime >= current_timestamp
+    AND (:startDate IS NULL OR f.departureTime >= :startDate)
+    AND (:endDate IS NULL OR f.departureTime <= :endDate)
+    GROUP BY f.id
+""")
+    List<FlightStatisticsDTO> getFlightStatistics(
+            @Param("airlineCode") String airlineCode,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
 }

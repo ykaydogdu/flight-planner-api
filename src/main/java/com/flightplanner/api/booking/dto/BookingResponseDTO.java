@@ -22,6 +22,7 @@ public class BookingResponseDTO {
     private LocalDateTime departureTime;
     private int flightDuration;
     private LocalDateTime arrivalTime;
+    private double totalPrice;
     private List<BookingPassengerResponseDTO> passengers;
     private LocalDateTime bookingDate;
 }

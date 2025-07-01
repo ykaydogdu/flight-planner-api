@@ -44,6 +44,17 @@ public class BookingController {
         return new ResponseEntity<>(bookingResponseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("")
+    @Operation(summary = "Get booking by flight ID", description = "Retrieves a booking with the specified flight ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bookings retreived successfully"),
+            @ApiResponse(responseCode = "404", description = "Flight not found")
+    })
+    public ResponseEntity<List<BookingResponseDTO>> getBookingByFlightId(@RequestParam Long flightId) {
+        List<BookingResponseDTO> bookingResponseDTOs = bookingService.getBookingByFlightId(flightId);
+        return new ResponseEntity<>(bookingResponseDTOs, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a booking by ID", description = "Deletes a booking with the specified ID.")
     @ApiResponses(value = {

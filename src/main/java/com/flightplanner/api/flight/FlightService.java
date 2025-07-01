@@ -139,6 +139,25 @@ public class FlightService {
         flightRepository.deleteById(id);
     }
 
+    public FlightStatisticsResponseDTO getFlightStatistics(final String code, final LocalDate startDate, final LocalDate endDate) {
+        List<FlightStatisticsDTO> flightStats = flightRepository.getFlightStatistics(code, startDate, endDate);
+        long overallBookings = flightStats.stream()
+                .mapToLong(FlightStatisticsDTO::getBookingCount)
+                .sum();
+        double overallRevenue = flightStats.stream()
+                .mapToDouble(FlightStatisticsDTO::getRevenue)
+                .sum();
+        long overallPassengerCount = flightStats.stream()
+                .mapToLong(FlightStatisticsDTO::getPassengerCount)
+                .sum();
+        return FlightStatisticsResponseDTO.builder()
+                .overallBookingCount(overallBookings)
+                .overallPassengerCount(overallPassengerCount)
+                .overallRevenue(overallRevenue)
+                .flightStats(flightStats)
+                .build();
+    }
+
     /**
      * Checks if the core attributes (airline, route, date) of a flight have changed.
      * @param existingFlight The existing record in the database
