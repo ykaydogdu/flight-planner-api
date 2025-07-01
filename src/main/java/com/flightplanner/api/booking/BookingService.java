@@ -91,9 +91,6 @@ public class BookingService {
                 .orElseThrow(() -> new NotFoundException("Flight"));
 
         List<Booking> bookings = bookingRepository.findAllByFlightId(flightId);
-        if (bookings.isEmpty()) {
-            throw new NotFoundException("No bookings found for this flight");
-        }
 
         return bookings.stream()
                 .map(this::getBookingResponseDTO)
