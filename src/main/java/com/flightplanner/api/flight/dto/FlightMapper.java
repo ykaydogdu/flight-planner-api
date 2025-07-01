@@ -93,7 +93,7 @@ public class FlightMapper {
         return flight;
     }
 
-    public FlightResponseClassDTO toResponseClassDTO(FlightResponseDTO flightResponseDTO, List<FlightClass> flightClasses) {
+    public FlightResponseClassDTO toResponseClassDTO(FlightResponseDTO flightResponseDTO, List<FlightClassDTO> flightClasses) {
         return FlightResponseClassDTO.builder()
                 .id(flightResponseDTO.getId())
                 .minPrice(flightResponseDTO.getMinPrice())
@@ -106,6 +106,15 @@ public class FlightMapper {
                 .originAirport(flightResponseDTO.getOriginAirport())
                 .destinationAirport(flightResponseDTO.getDestinationAirport())
                 .classes(flightClasses)
+                .build();
+    }
+
+    public FlightClassDTO toClassDTO(FlightClass flightClass) {
+        return FlightClassDTO.builder()
+                .flightClass(flightClass.getFlightClass())
+                .seatCount(flightClass.getSeatCount())
+                .availableSeats(flightClass.getAvailableSeats())
+                .price(flightClass.getPrice())
                 .build();
     }
 }

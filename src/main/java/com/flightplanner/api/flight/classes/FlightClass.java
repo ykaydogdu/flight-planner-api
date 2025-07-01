@@ -37,4 +37,8 @@ public class FlightClass {
         this.availableSeats = seatCount; // Initially all seats are available
         this.price = price;
     }
+
+    public Long getFlightId() {
+        return flight != null ? flight.getId() : null;
+    }
 }

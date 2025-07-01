@@ -31,7 +31,7 @@ public class FlightController {
     }
 
     @GetMapping("")
-    @Operation(summary = "Get all flights", description = "Retrieves a list of all available flights.")
+    @Operation(summary = "Get all flights", description = "Retrieves a list of all available flights with optional filtering by route, date, passenger capacity, and past flights.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of flights"),
     })
@@ -39,9 +39,22 @@ public class FlightController {
             @RequestParam(required = false) String airlineCode,
             @RequestParam(required = false) String originAirportCode,
             @RequestParam(required = false) String destinationAirportCode,
-            @RequestParam(required = false) LocalDate departureDate
+            @RequestParam(required = false) LocalDate departureDate,
+            @RequestParam(required = false, defaultValue = "0") Integer passengerEconomy,
+            @RequestParam(required = false, defaultValue = "0") Integer passengerBusiness,
+            @RequestParam(required = false, defaultValue = "0") Integer passengerFirstClass,
+            @RequestParam(required = false, defaultValue = "false") Boolean includePast
     ) {
-        List<FlightResponseClassDTO> flights = flightService.getAllFlights(airlineCode, originAirportCode, destinationAirportCode, departureDate);
+        List<FlightResponseClassDTO> flights = flightService.getAllFlights(
+                airlineCode, 
+                originAirportCode, 
+                destinationAirportCode, 
+                departureDate,
+                passengerEconomy,
+                passengerBusiness,
+                passengerFirstClass,
+                includePast
+        );
         return ResponseEntity.ok(flights);
     }
 

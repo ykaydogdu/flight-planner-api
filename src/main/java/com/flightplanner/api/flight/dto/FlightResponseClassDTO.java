@@ -2,7 +2,6 @@ package com.flightplanner.api.flight.dto;
 
 import com.flightplanner.api.airline.Airline;
 import com.flightplanner.api.airport.Airport;
-import com.flightplanner.api.flight.classes.FlightClass;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +28,5 @@ public class FlightResponseClassDTO {
     private Airline airline;
     private Airport originAirport;
     private Airport destinationAirport;
-    private List<FlightClass> classes;
+    private List<FlightClassDTO> classes;
 }

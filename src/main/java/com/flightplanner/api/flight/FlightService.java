@@ -1,16 +1,13 @@
 package com.flightplanner.api.flight;
 
 import com.flightplanner.api.NotFoundException;
-import com.flightplanner.api.flight.dto.FlightMapper;
-import com.flightplanner.api.flight.dto.FlightRequestDTO;
-import com.flightplanner.api.flight.dto.FlightResponseClassDTO;
-import com.flightplanner.api.flight.dto.FlightResponseDTO;
+import com.flightplanner.api.flight.classes.FlightClass;
+import com.flightplanner.api.flight.dto.*;
 import com.flightplanner.api.flight.exception.FlightLimitExceededException;
 import com.flightplanner.api.UnauthorizedActionException;
 import com.flightplanner.api.user.User;
 import com.flightplanner.api.user.UserRepository;
 import com.flightplanner.api.flight.classes.FlightClassRepository;
-import com.flightplanner.api.flight.classes.FlightClass;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -23,6 +20,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class FlightService {
@@ -45,19 +44,46 @@ public class FlightService {
     public List<FlightResponseClassDTO> getAllFlights(String airlineCode,
                                                  String originAirportCode,
                                                  String destinationAirportCode,
-                                                 LocalDate departureDate) {
+                                                 LocalDate departureDate,
+                                                 Integer passengerEconomy,
+                                                 Integer passengerBusiness,
+                                                 Integer passengerFirstClass,
+                                                 Boolean includePast) {
+        
+        // Handle null values for passenger counts
+        boolean includeAllFlights = includePast != null && includePast;
+        
         List<FlightResponseDTO> flights = flightRepository.findFilteredFlights(
                 airlineCode,
                 originAirportCode,
                 destinationAirportCode,
                 departureDate != null ? departureDate.atStartOfDay() : null,
-                departureDate != null ? departureDate.atTime(LocalTime.MAX) : null
+                departureDate != null ? departureDate.atTime(LocalTime.MAX) : null,
+                includeAllFlights,
+                passengerEconomy,
+                passengerBusiness,
+                passengerFirstClass
         );
         flights.forEach(flightMapper::fixTimeZone);
-        return flights.stream().map(flight -> {
-            List<FlightClass> flightClasses = flightClassRepository.findByFlightId(flight.getId());
-            return flightMapper.toResponseClassDTO(flight, flightClasses);
-        }).toList();
+
+        // batch load classes
+        List<Long> flightIds = flights.stream()
+                .map(FlightResponseDTO::getId)
+                .toList();
+        List<FlightClass> flightClasses = flightClassRepository.findByFlightIds(flightIds);
+
+        Map<Long, List<FlightClass>> classesByFlightId = flightClasses.stream()
+                .collect(Collectors.groupingBy(FlightClass::getFlightId));
+        
+        return flights.stream()
+                .map(flight -> {
+                    List<FlightClass> classes = classesByFlightId.getOrDefault(flight.getId(), List.of());
+                    List<FlightClassDTO> classDTOs = classes.stream()
+                            .map(flightMapper::toClassDTO)
+                            .toList();
+                    return flightMapper.toResponseClassDTO(flight, classDTOs);
+                })
+                .toList();
     }
 
     public List<FlightResponseDTO> getAllFlights() {

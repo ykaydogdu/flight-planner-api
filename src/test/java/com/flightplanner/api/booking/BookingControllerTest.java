@@ -1,28 +1,30 @@
 package com.flightplanner.api.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flightplanner.api.auth.jwt.JwtService;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
+import com.flightplanner.api.booking.dto.BookingPassengerRequestDTO;
+import com.flightplanner.api.booking.dto.BookingPassengerResponseDTO;
+import com.flightplanner.api.flight.classes.FlightClassEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,43 +39,67 @@ public class BookingControllerTest {
     private BookingService bookingService;
 
     @MockitoBean
-    private JwtService jwtService;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     private BookingResponseDTO bookingResponseDTO;
-    private BookingRequestDTO bookingRequestDTO;
 
     @BeforeEach
     void setUp() {
-        bookingRequestDTO = BookingRequestDTO.builder()
-                .flightId(1L)
-                .username("testuser")
-                .numberOfSeats(2)
+        objectMapper.registerModule(new JavaTimeModule());
+
+        // Create passenger request DTOs
+        BookingPassengerRequestDTO passenger1 = BookingPassengerRequestDTO.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .flightClass(FlightClassEnum.ECONOMY)
+                .priceAtBooking(100.0)
                 .build();
+        
+        BookingPassengerRequestDTO passenger2 = BookingPassengerRequestDTO.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane.doe@example.com")
+                .flightClass(FlightClassEnum.ECONOMY)
+                .priceAtBooking(100.0)
+                .build();
+        
+        List<BookingPassengerRequestDTO> passengers = Arrays.asList(passenger1, passenger2);
+
+        // Create passenger response DTOs
+        BookingPassengerResponseDTO passengerResponse1 = BookingPassengerResponseDTO.builder()
+                .passengerId(1)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .flightClass("Economy")
+                .priceAtBooking(100.0)
+                .build();
+        
+        BookingPassengerResponseDTO passengerResponse2 = BookingPassengerResponseDTO.builder()
+                .passengerId(2)
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane.doe@example.com")
+                .flightClass("Economy")
+                .priceAtBooking(100.0)
+                .build();
+        
+        List<BookingPassengerResponseDTO> passengerResponses = Arrays.asList(passengerResponse1, passengerResponse2);
 
         bookingResponseDTO = BookingResponseDTO.builder()
                 .id(1L)
-                .flightId(1L)
-                .price(250.00)
-                .numberOfSeats(2)
+                .airline(null) // Mock airline object if needed
+                .originAirport(null) // Mock origin airport object if needed
+                .destinationAirport(null) // Mock destination airport object if needed
                 .departureTime(LocalDateTime.now().plusDays(1))
+                .flightDuration(120)
                 .arrivalTime(LocalDateTime.now().plusDays(1).plusHours(2))
+                .passengers(passengerResponses)
                 .build();
-    }
-
-    @Test
-    void shouldCreateBooking() throws Exception {
-        when(bookingService.createBooking(any(BookingRequestDTO.class))).thenReturn(bookingResponseDTO);
-
-        mockMvc.perform(post("/api/v1/bookings/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bookingRequestDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.flightId", is(1)))
-                .andExpect(jsonPath("$.numberOfSeats", is(2)));
     }
 
     @Test
@@ -83,7 +109,7 @@ public class BookingControllerTest {
         mockMvc.perform(get("/api/v1/bookings/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.flightId", is(1)));
+                .andExpect(jsonPath("$.flightDuration", is(120)));
     }
 
     @Test

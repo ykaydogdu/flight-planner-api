@@ -45,6 +45,16 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
         and (:originAirportCode is null or f.originAirport.code = :originAirportCode)
         and (:destinationAirportCode is null or f.destinationAirport.code = :destinationAirportCode)
         and (:departureDateStart is null or :departureDateEnd is null or f.departureTime between :departureDateStart and :departureDateEnd)
+        and (:includePast = true or f.departureTime >= current_timestamp)
+        and (
+            :passengerEconomy = 0 or (select fc.availableSeats from FlightClass fc where fc.flight.id = f.id and fc.flightClass = 'ECONOMY') >= :passengerEconomy
+        )
+        and (
+            :passengerBusiness = 0 or (select fc.availableSeats from FlightClass fc where fc.flight.id = f.id and fc.flightClass = 'BUSINESS') >= :passengerBusiness
+        )
+        and (
+            :passengerFirstClass = 0 or (select fc.availableSeats from FlightClass fc where fc.flight.id = f.id and fc.flightClass = 'FIRST_CLASS') >= :passengerFirstClass
+        )
         group by f.id
     """)
     List<FlightResponseDTO> findFilteredFlights(
@@ -52,7 +62,11 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             @Param("originAirportCode") String originAirportCode,
             @Param("destinationAirportCode") String destinationAirportCode,
             @Param("departureDateStart") LocalDateTime departureDateStart,
-            @Param("departureDateEnd") LocalDateTime departureDateEnd
+            @Param("departureDateEnd") LocalDateTime departureDateEnd,
+            @Param("includePast") Boolean includePast,
+            @Param("passengerEconomy") Integer passengerEconomy,
+            @Param("passengerBusiness") Integer passengerBusiness,
+            @Param("passengerFirstClass") Integer passengerFirstClass
     );
 
     @Query("""

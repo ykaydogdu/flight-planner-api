@@ -7,6 +7,10 @@ import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
 import com.flightplanner.api.flight.dto.FlightMapper;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
+import com.flightplanner.api.flight.dto.FlightResponseClassDTO;
+import com.flightplanner.api.flight.classes.FlightClass;
+import com.flightplanner.api.flight.classes.FlightClassEnum;
+import com.flightplanner.api.booking.BookingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,8 @@ class FlightControllerTest {
     private FlightMapper flightMapper;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private BookingService bookingService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -55,9 +61,9 @@ class FlightControllerTest {
     void getAllFlights_shouldReturnListOfFlights() throws Exception {
         // Arrange
         LocalDateTime now = LocalDateTime.now();
-        FlightResponseDTO flight1 = FlightResponseDTO.builder()
+        FlightResponseClassDTO flight1 = FlightResponseClassDTO.builder()
                 .id(1L)
-                .price(100)
+                .minPrice(100)
                 .seatCount(100)
                 .emptySeats(50)
                 .departureTime(now)
@@ -66,11 +72,12 @@ class FlightControllerTest {
                 .airline(null) // Mock airline object if needed
                 .originAirport(null) // Mock origin airport object if needed
                 .destinationAirport(null) // Mock destination airport object if needed
+                .classes(null) // Mock flight classes if needed
                 .build();
 
-        FlightResponseDTO flight2 = FlightResponseDTO.builder()
+        FlightResponseClassDTO flight2 = FlightResponseClassDTO.builder()
                 .id(2L)
-                .price(100)
+                .minPrice(100)
                 .seatCount(100)
                 .emptySeats(50)
                 .departureTime(now.plusHours(2))
@@ -79,12 +86,13 @@ class FlightControllerTest {
                 .airline(null) // Mock airline object if needed
                 .originAirport(null) // Mock origin airport object if needed
                 .destinationAirport(null) // Mock destination airport object if needed
+                .classes(null) // Mock flight classes if needed
                 .build();
 
-        List<FlightResponseDTO> allFlights = Arrays.asList(flight1, flight2);
+        List<FlightResponseClassDTO> allFlights = Arrays.asList(flight1, flight2);
 
         // Mock service behavior
-        when(flightService.getAllFlights(any(), any(), any(), any())).thenReturn(allFlights);
+        when(flightService.getAllFlights(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(allFlights);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/flights"))
@@ -98,14 +106,20 @@ class FlightControllerTest {
     void createFlight_shouldReturnCreatedStatusAndFlightResponseDTO() throws Exception {
         // Arrange
         LocalDateTime departureTime = LocalDateTime.now().plusDays(7);
-        FlightRequestDTO requestDTO = new FlightRequestDTO(departureTime, 120, 100.0, 100, "UA", "ORD", "SFO");
+        
+        // Create flight classes for the request
+        FlightClass economyClass = new FlightClass(null, FlightClassEnum.ECONOMY, 80, 100.0);
+        FlightClass businessClass = new FlightClass(null, FlightClassEnum.BUSINESS, 20, 300.0);
+        List<FlightClass> flightClasses = Arrays.asList(economyClass, businessClass);
+        
+        FlightRequestDTO requestDTO = new FlightRequestDTO(departureTime, 120, "UA", "ORD", "SFO", flightClasses);
         FlightResponseDTO responseDTO = FlightResponseDTO.builder()
                 .id(3L)
-                .price(100.0)
-                .seatCount(100)
-                .emptySeats(50)
+                .minPrice(100.0)
+                .seatCount(100L)
+                .emptySeats(50L)
                 .departureTime(departureTime)
-                .duration(120)
+                .duration(120L)
                 .arrivalTime(departureTime.plusHours(2))
                 .airline(null) // Mock airline object if needed
                 .originAirport(null) // Mock origin airport object if needed
@@ -122,7 +136,7 @@ class FlightControllerTest {
                 .andExpect(status().isCreated()) // Expect 201 Created
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(3)))
-                .andExpect(jsonPath("$.price", is(100.0)))
+                .andExpect(jsonPath("$.minPrice", is(100.0)))
                 .andExpect(jsonPath("$.seatCount", is(100)));
 
         // Verify service method was called with appropriate argument
@@ -136,11 +150,11 @@ class FlightControllerTest {
         LocalDateTime now = LocalDateTime.now();
         FlightResponseDTO responseDTO = FlightResponseDTO.builder()
                 .id(flightId)
-                .price(100.0)
-                .seatCount(100)
-                .emptySeats(50)
+                .minPrice(100.0)
+                .seatCount(100L)
+                .emptySeats(50L)
                 .departureTime(now)
-                .duration(120)
+                .duration(120L)
                 .arrivalTime(now.plusHours(2))
                 .airline(null) // Mock airline object if needed
                 .originAirport(null) // Mock origin airport object if needed
@@ -155,7 +169,7 @@ class FlightControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(4)))
-                .andExpect(jsonPath("$.price", is(100.0)))
+                .andExpect(jsonPath("$.minPrice", is(100.0)))
                 .andExpect(jsonPath("$.seatCount", is(100)));
 
         // Verify service method was called
@@ -185,14 +199,20 @@ class FlightControllerTest {
         // Arrange
         Long flightId = 5L;
         LocalDateTime updatedTime = LocalDateTime.now().plusDays(10);
-        FlightRequestDTO requestDTO = new FlightRequestDTO(updatedTime, 120, 150.0, 120, "DL", "LAX", "SEA");
+        
+        // Create flight classes for the request
+        FlightClass economyClass = new FlightClass(null, FlightClassEnum.ECONOMY, 100, 150.0);
+        FlightClass businessClass = new FlightClass(null, FlightClassEnum.BUSINESS, 20, 450.0);
+        List<FlightClass> flightClasses = Arrays.asList(economyClass, businessClass);
+        
+        FlightRequestDTO requestDTO = new FlightRequestDTO(updatedTime, 120, "DL", "LAX", "SEA", flightClasses);
         FlightResponseDTO responseDTO = FlightResponseDTO.builder()
                 .id(flightId)
-                .price(150.0)
-                .seatCount(120)
-                .emptySeats(60)
+                .minPrice(150.0)
+                .seatCount(120L)
+                .emptySeats(60L)
                 .departureTime(updatedTime)
-                .duration(120)
+                .duration(120L)
                 .arrivalTime(updatedTime.plusHours(2))
                 .airline(null) // Mock airline object if needed
                 .originAirport(null) // Mock origin airport object if needed
@@ -209,7 +229,7 @@ class FlightControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(5)))
-                .andExpect(jsonPath("$.price", is(150.0)))
+                .andExpect(jsonPath("$.minPrice", is(150.0)))
                 .andExpect(jsonPath("$.seatCount", is(120)));
 
         // Verify service method was called
