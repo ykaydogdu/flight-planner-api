@@ -35,7 +35,8 @@ public class BookingService {
         this.bookingPassengerRepository = bookingPassengerRepository;
     }
 
-    public BookingResponseDTO bookFlight(long flightId, BookingRequestDTO bookingRequestDTO) {
+    public BookingResponseDTO bookFlight(BookingRequestDTO bookingRequestDTO) {
+        Long flightId = bookingRequestDTO.getFlightId();
         Flight flight = flightRepository.findById(flightId)
                 .orElseThrow(() -> new NotFoundException("Flight"));
         User user = userRepository.findById(bookingRequestDTO.getUsername())
@@ -125,6 +126,7 @@ public class BookingService {
                 .flightDuration(flight.getDuration())
                 .arrivalTime(flight.getArrivalTime())
                 .passengers(passengerDTOs)
+                .bookingDate(booking.getBookingDate())
                 .build();
     }
 }

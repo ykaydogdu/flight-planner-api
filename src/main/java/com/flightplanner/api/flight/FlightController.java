@@ -1,11 +1,7 @@
 package com.flightplanner.api.flight;
 
-import com.flightplanner.api.booking.BookingService;
-import com.flightplanner.api.booking.dto.BookingRequestDTO;
-import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.flight.dto.FlightRequestDTO;
 import com.flightplanner.api.flight.dto.FlightResponseDTO;
-import com.flightplanner.api.flight.dto.FlightDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,12 +18,9 @@ import java.util.List;
 public class FlightController {
 
     private final FlightService flightService;
-    private final BookingService bookingService;
-
     @Autowired
-    FlightController(FlightService flightService, BookingService bookingService) {
+    FlightController(FlightService flightService) {
         this.flightService = flightService;
-        this.bookingService = bookingService;
     }
 
     @GetMapping("")
@@ -99,17 +92,5 @@ public class FlightController {
     ResponseEntity<Void> deleteFlight(@PathVariable Long id) {
         flightService.deleteFlight(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PostMapping("/{id}/book")
-    @Operation(summary = "Book a flight", description = "Books a flight with the specified ID using the provided details.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Flight booked successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid booking request data"),
-            @ApiResponse(responseCode = "404", description = "Flight not found"),
-    })
-    public ResponseEntity<BookingResponseDTO> bookFlight(@PathVariable Long id, @RequestBody BookingRequestDTO dto) {
-        BookingResponseDTO bookingResponseDTO = bookingService.bookFlight(id, dto);
-        return new ResponseEntity<>(bookingResponseDTO, HttpStatus.CREATED);
     }
 }
