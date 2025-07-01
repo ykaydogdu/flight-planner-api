@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: flightbooker-backend
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/flightbooker
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_PROFILES_ACTIVE=prod
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+
+  frontend:
+    build: ./flight-planner-frontend
+    container_name: flightbooker-frontend
+    ports:
+      - 3000:80
+    depends_on:
+      - backend
+  
+  mysql:
+    image: mysql:8.0
+    container_name: flightbooker-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=flightbooker
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+      
