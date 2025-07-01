@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,6 +35,7 @@ public class TimezoneService {
         return instant.atZone(timezone.toZoneId()).toLocalDateTime();
     }
 
+    @Cacheable("timezones")
     public TimeZone getTimezone(double latitude, double longitude) {
         String url = UriComponentsBuilder.fromUriString(TIMEZONE_API_URL)
                 .queryParam("latitude", latitude)
