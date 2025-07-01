@@ -3,6 +3,8 @@ package com.flightplanner.api.booking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flightplanner.api.auth.jwt.JwtAuthenticationFilter;
+import com.flightplanner.api.booking.dto.BookingPassengerRequestDTO;
+import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.booking.dto.BookingPassengerResponseDTO;
 import com.flightplanner.api.flight.classes.FlightClassEnum;
@@ -15,12 +17,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -57,7 +59,7 @@ public class BookingControllerTest {
                 .priceAtBooking(100.0)
                 .build();
         
-        List<BookingPassengerResponseDTO> passengerResponses = Arrays.asList(passengerResponse);
+        List<BookingPassengerResponseDTO> passengerResponses = Collections.singletonList(passengerResponse);
 
         bookingResponseDTO = BookingResponseDTO.builder()
                 .id(1L)
@@ -98,5 +100,40 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(1)));
+    }
+
+    @Test
+    void shouldBookFlight() throws Exception {
+        BookingRequestDTO bookingRequestDTO = BookingRequestDTO.builder()
+                .flightId(1L)
+                .passengers(Collections.singletonList(
+                        BookingPassengerRequestDTO.builder()
+                                .firstName("John")
+                                .lastName("Doe")
+                                .email("john.doe@example.com")
+                                .flightClass(FlightClassEnum.ECONOMY)
+                                .build()
+                ))
+                .build();
+
+        when(bookingService.bookFlight(any(BookingRequestDTO.class))).thenReturn(bookingResponseDTO);
+
+        mockMvc.perform(post("/api/v1/bookings/create")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(bookingRequestDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.flightDuration", is(120)));
+    }
+
+    @Test
+    void shouldGetBookingByFlightId() throws Exception {
+        when(bookingService.getBookingByFlightId(anyLong())).thenReturn(Collections.singletonList(bookingResponseDTO));
+
+        mockMvc.perform(get("/api/v1/bookings?flightId=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].flightDuration", is(120)));
     }
 }

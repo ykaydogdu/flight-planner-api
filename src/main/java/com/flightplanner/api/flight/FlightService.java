@@ -28,7 +28,7 @@ public class FlightService {
     private final FlightRepository flightRepository;
     private final FlightClassRepository flightClassRepository;
     private final FlightMapper flightMapper;
-    private static final int MAX_DAILY_FLIGHTS = 3;
+    static final int MAX_DAILY_FLIGHTS = 3;
 
     private final UserRepository userRepository;
 

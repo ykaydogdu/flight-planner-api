@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.flightplanner.api.flight.FlightService.MAX_DAILY_FLIGHTS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -171,6 +172,17 @@ class FlightServiceTest {
     }
 
     @Test
+    void getFlightById_shouldThrowNotFoundException_whenFlightNotFound() {
+        // Arrange
+        Long flightId = 1L;
+        when(flightRepository.findByIdWithEmptySeats(flightId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> flightService.getFlightById(flightId));
+        verify(flightRepository, times(1)).findByIdWithEmptySeats(flightId);
+    }
+
+    @Test
     void createFlight_shouldSaveFlightAndReturnResponseDTO_withinLimit() {
         // Arrange
         // Assume dailyFlightCount returns less than MAX_DAILY_FLIGHTS
@@ -225,23 +237,24 @@ class FlightServiceTest {
     }
 
     @Test
+    void createFlight_shouldThrowFlightLimitExceededException_whenDailyLimitExceeded() {
+        // Arrange
+        when(flightMapper.toEntity(any(FlightRequestDTO.class))).thenReturn(flightEntity);
+        when(flightRepository.dailyFlightCount(anyString(), anyString(), anyString(), any(), any())).thenReturn((long) MAX_DAILY_FLIGHTS);
+
+        // Act & Assert
+        assertThrows(FlightLimitExceededException.class, () -> flightService.createFlight(flightRequestDTO));
+        verify(flightRepository, times(1)).dailyFlightCount(anyString(), anyString(), anyString(), any(), any());
+    }
+
+    @Test
     void updateFlight_shouldUpdateAndReturnResponseDTO_whenAttrsChangedAndWithinLimit() {
         // Arrange
         Long flightId = 1L;
         LocalDateTime newDepartureTime = testDepartureTime.plusDays(1); // Date changed
 
         // Create flight classes for the updated request
-        FlightClass economyClass = new FlightClass(null, FlightClassEnum.ECONOMY, 80, 150.0);
-        FlightClass businessClass = new FlightClass(null, FlightClassEnum.BUSINESS, 20, 400.0);
-        List<FlightClass> updatedFlightClasses = List.of(economyClass, businessClass);
-
-        FlightRequestDTO updatedRequestDTO = new FlightRequestDTO();
-        updatedRequestDTO.setDepartureTime(newDepartureTime);
-        updatedRequestDTO.setDuration(120);
-        updatedRequestDTO.setAirlineCode("THY");
-        updatedRequestDTO.setOriginAirportCode("IST");
-        updatedRequestDTO.setDestinationAirportCode("CDG");
-        updatedRequestDTO.setFlightClasses(updatedFlightClasses);
+        FlightRequestDTO updatedRequestDTO = getFlightRequestDTO(newDepartureTime);
 
         Flight updatedFlightEntity = new Flight();
         updatedFlightEntity.setId(flightId);
@@ -276,6 +289,21 @@ class FlightServiceTest {
         assertNotNull(result);
         assertEquals(flightResponseDTO, result);
         verify(flightRepository, times(1)).save(updatedFlightEntity);
+    }
+
+    private static FlightRequestDTO getFlightRequestDTO(LocalDateTime newDepartureTime) {
+        FlightClass economyClass = new FlightClass(null, FlightClassEnum.ECONOMY, 80, 150.0);
+        FlightClass businessClass = new FlightClass(null, FlightClassEnum.BUSINESS, 20, 400.0);
+        List<FlightClass> updatedFlightClasses = List.of(economyClass, businessClass);
+
+        FlightRequestDTO updatedRequestDTO = new FlightRequestDTO();
+        updatedRequestDTO.setDepartureTime(newDepartureTime);
+        updatedRequestDTO.setDuration(120);
+        updatedRequestDTO.setAirlineCode("THY");
+        updatedRequestDTO.setOriginAirportCode("IST");
+        updatedRequestDTO.setDestinationAirportCode("CDG");
+        updatedRequestDTO.setFlightClasses(updatedFlightClasses);
+        return updatedRequestDTO;
     }
 
 
@@ -367,6 +395,22 @@ class FlightServiceTest {
     }
 
     @Test
+    void deleteFlight_shouldThrowUnauthorizedActionException_whenUserNotAuthorized() {
+        // Arrange
+        Long flightId = 1L;
+        when(flightRepository.findById(flightId)).thenReturn(Optional.of(flightEntity));
+
+        // Use a spy to partially mock FlightService
+        FlightService spyFlightService = spy(flightService);
+        doThrow(new UnauthorizedActionException("User not authorized"))
+                .when(spyFlightService).validateAirlineStaffAuthorization(anyString());
+
+        // Act & Assert
+        assertThrows(UnauthorizedActionException.class, () -> spyFlightService.deleteFlight(flightId));
+        verify(flightRepository, times(1)).findById(flightId);
+    }
+
+    @Test
     void validateAirlineStaffAuthorization_shouldThrowUnauthorizedActionException_whenUserIsNotAirlineStaff() {
         userEntity.setRole(com.flightplanner.api.user.Role.ROLE_USER);
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -395,5 +439,20 @@ class FlightServiceTest {
         when(userRepository.findById(userEntity.getUsername())).thenReturn(Optional.of(userEntity));
         SecurityContextHolder.setContext(securityContext);
         assertDoesNotThrow(() -> flightService.validateAirlineStaffAuthorization("THY"));
+    }
+
+    @Test
+    void updateFlight_shouldThrowUnauthorizedActionException_whenAirlineCodeChanged() {
+        // Arrange
+        Long flightId = 1L;
+        when(flightRepository.findById(flightId)).thenReturn(Optional.of(flightEntity));
+        flightRequestDTO.setAirlineCode("NEW_CODE");
+
+        when(userRepository.findById(userEntity.getUsername())).thenReturn(Optional.of(userEntity));
+        when(flightMapper.toEntity(flightRequestDTO)).thenReturn(flightEntity);
+
+        // Act & Assert
+        assertThrows(UnauthorizedActionException.class, () -> flightService.updateFlight(flightId, flightRequestDTO));
+        verify(flightRepository, times(1)).findById(flightId);
     }
 }

@@ -5,6 +5,7 @@ import com.flightplanner.api.airport.Airport;
 import com.flightplanner.api.booking.dto.BookingRequestDTO;
 import com.flightplanner.api.booking.dto.BookingResponseDTO;
 import com.flightplanner.api.booking.dto.BookingPassengerRequestDTO;
+import com.flightplanner.api.booking.exception.NotEnoughSeatsException;
 import com.flightplanner.api.booking.passenger.BookingPassenger;
 import com.flightplanner.api.booking.passenger.BookingPassengerRepository;
 import com.flightplanner.api.flight.Flight;
@@ -162,7 +163,7 @@ class BookingServiceTest {
         // Arrange
         // Make economy class fully booked
         flightClasses.getFirst().setAvailableSeats(1); // Only 1 seat available but 2 requested
-        
+
         when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
         when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
 
@@ -191,6 +192,49 @@ class BookingServiceTest {
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> bookingService.bookFlight(bookingRequestDTO));
+        verify(bookingRepository, never()).save(any());
+        verify(bookingPassengerRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void bookFlight_shouldThrowException_whenInvalidNumberOfSeatsRequested() {
+        // Arrange
+        bookingRequestDTO.setPassengers(List.of()); // Invalid number of seats
+
+        when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
+        when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> bookingService.bookFlight(bookingRequestDTO));
+        verify(bookingRepository, never()).save(any());
+        verify(bookingPassengerRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void bookFlight_shouldThrowException_whenNotEnoughSeatsAvailable() {
+        // Arrange
+        flightClasses.getFirst().setAvailableSeats(1); // Only 1 seat available
+        bookingRequestDTO.setPassengers(List.of(
+            BookingPassengerRequestDTO.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .flightClass(FlightClassEnum.ECONOMY)
+                .priceAtBooking(100.0)
+                .build()
+        , BookingPassengerRequestDTO.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane.doe@example.com")
+                .flightClass(FlightClassEnum.ECONOMY)
+                .priceAtBooking(100.0)
+                .build())); // Requesting 2 seats
+
+        when(flightRepository.findById(1L)).thenReturn(Optional.of(flight));
+        when(userRepository.findById("testUser")).thenReturn(Optional.of(user));
+
+        // Act & Assert
+        assertThrows(NotEnoughSeatsException.class, () -> bookingService.bookFlight(bookingRequestDTO));
         verify(bookingRepository, never()).save(any());
         verify(bookingPassengerRepository, never()).saveAll(anyList());
     }
