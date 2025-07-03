@@ -13,6 +13,7 @@ env:
 
 jobs:
   test:
+    name: Run Maven Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -65,4 +66,7 @@ jobs:
             --region=$REGION \
             --platform=managed \
             --allow-unauthenticated \
-            --set-env-vars SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }},SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }},SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }},JWT_SECRET=${{ secrets.JWT_SECRET }}
+            --set-env-vars SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
+            --set-env-vars SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
+            --set-env-vars SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
+            --set-env-vars JWT_SECRET=${{ secrets.JWT_SECRET }}
