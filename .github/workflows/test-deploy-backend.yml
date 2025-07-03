@@ -67,4 +67,4 @@ jobs:
             --platform=managed \
             --allow-unauthenticated \
             --add-cloudsql-instances=flight-planner-app-464807:us-central1:flight-planner-sql \
-            --set-env-vars="SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }},SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }},SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }},JWT_SECRET=${{ secrets.JWT_SECRET }}"
+            --set-env-vars="SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }},SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }},SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }},JWT_SECRET=${{ secrets.JWT_SECRET }},FRONTEND_URL=https://flight-planner-frontend-323247003818.us-central1.run.app/"
