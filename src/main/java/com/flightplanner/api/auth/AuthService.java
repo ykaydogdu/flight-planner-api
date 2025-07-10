@@ -52,7 +52,7 @@ public class AuthService {
         }
 
         if (userRepository.existsById(username)) {
-            throw new UserAlreadyExistsException("Username " + username + " already exists");
+            throw new UserAlreadyExistsException(username);
         }
 
         String encodedPassword = bCryptPasswordEncoder.encode(password);
